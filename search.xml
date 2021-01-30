@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>什么？Mysql还有统计信息一说？</title>
+      <link href="2021/01/30/mysql-stats-info/"/>
+      <url>2021/01/30/mysql-stats-info/</url>
+      
+        <content type="html"><![CDATA[<p>笔者最近在项目上对现有表进行了结构优化，并对一个常用表添加了索引。可谓测试环境玩漂移，生产环境怕翻车啊。上线验证的那一刻，突然发现一个类似报表功能的查询SQL极慢！</p><h1 id="背景说明"><a href="#背景说明" class="headerlink" title="背景说明"></a>背景说明</h1><ol><li><p>故障简查</p><p> 检查添加索引索引的SQL，查看SQL执行结果，检查DDL。一顿操作后，表象上没看出问题</p></li><li><p>比较执行计划</p><p> 连接sit环境执行explain，发现没问题，索引正常用上的。在生产的dbms上执行explain，发现索引没有用上，join查询时全表扫描了</p></li><li><p>查看MySQL版本</p><p> sit和prd环境都是5.7.22版本，看样子也是不是</p></li><li><p>再次分析</p><p> 既然MySQL版本也一样，DDL也一样，为啥执行计划就是不一样呢？一边猜测着是不是有什么缓存，一边为了节约发布时间，让运维帮忙先把索引删掉再重新添加下</p></li><li><p>问题暴露</p><p> 也许是运维对问题的普遍性或者敏感性，过了两三分钟，便通知我们好了！心里便纳了闷了，运维大牛确实牛啊！咨询了一番，便引出今天的话题了：刷新了<emp>统计信息</emp></p></li></ol><h1 id="统计信息研究"><a href="#统计信息研究" class="headerlink" title="统计信息研究"></a>统计信息研究</h1><p>本文为随笔，具体的研究文章待补充上线!</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 随笔 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> MySQL </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>纪实:nodejs+hexo+volantis快速构建个人Blog</title>
       <link href="2021/01/17/fast-build-blog/"/>
       <url>2021/01/17/fast-build-blog/</url>

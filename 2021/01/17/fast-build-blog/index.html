@@ -110,7 +110,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
   <body>
     
 
-<header id="l_header" class="l_header auto shadow blur " style='opacity: 0' >
+<header id="l_header" class="l_header auto shadow blur show" style='opacity: 0' >
   <div class='container'>
   <div id='wrapper'>
     <div class='nav-sub'>
@@ -174,11 +174,11 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
             
             
               <li>
-                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                <a class="menuitem flat-box faa-parent animated-hover" href=/essay
                   
                   
                   
-                    id="home"
+                    id="essay"
                   >
                   <i class='fas fa-pencil-alt fa-fw'></i>随笔
                 </a>
@@ -223,7 +223,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
             
               <li>
                 <a class="menuitem flat-box header toggle-mode-btn">
-                  <i class='fas fa-moon fa-fw'></i>暗黑模式
+                  <i class='fas fa-moon fa-fw'></i>关灯
                 </a>
               <li>
             
@@ -282,11 +282,11 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
               
             
               <li>
-                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                <a class="menuitem flat-box faa-parent animated-hover" href=/essay
                   
                   
                   
-                    id="home"
+                    id="essay"
                   >
                   <i class='fas fa-pencil-alt fa-fw'></i>随笔
                 </a>
@@ -331,7 +331,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
             
               <li>
                 <a class="menuitem flat-box header toggle-mode-btn">
-                  <i class='fas fa-moon fa-fw'></i>暗黑模式
+                  <i class='fas fa-moon fa-fw'></i>关灯
                 </a>
               <li>
             
@@ -349,7 +349,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
       <div id="l_cover">
   
     
-        <div id="half" class='cover-wrapper post dock' style="display: ;">
+        <div id="full" class='cover-wrapper post dock' style="display: none;">
           
             <div id='cover-backstretch'></div>
           
@@ -587,10 +587,10 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
     <div class='new-meta-box'>
       
         
-          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-01-29T22:03:20+08:00">
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-01-30T18:20:03+08:00">
   <a class='notlink'>
     <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
-    <p>更新于：2021年1月29日</p>
+    <p>更新于：2021年1月30日</p>
   </a>
 </div>
 
@@ -679,6 +679,19 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
   
 
   
+    <div class="prev-next">
+      
+        <a class='prev' href='/2021/01/30/mysql-stats-info/'>
+          <p class='title'><i class="fas fa-chevron-left" aria-hidden="true"></i>什么？Mysql还有统计信息一说？</p>
+          <p class='content'>笔者最近在项目上对现有表进行了结构优化，并对一个常用表添加了索引。可谓测试环境玩漂移，生产环境怕翻车啊。上线验证的那一刻，突然发现一个类似报表功能的查询SQL极慢！
+背景说明
+故障简查
+ 检查添...</p>
+        </a>
+      
+      
+    </div>
+  
 </article>
 
 
@@ -742,7 +755,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
 
   var l_header=document.getElementById("l_header");
   
-  l_header.classList.remove("show");
+  l_header.classList.add("show");
   
 </script>
 
