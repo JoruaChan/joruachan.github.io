@@ -172,7 +172,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
             
             
               <li>
-                <a class="menuitem flat-box faa-parent animated-hover" href=/essay
+                <a class="menuitem flat-box faa-parent animated-hover" href=/essay/
                   
                   
                   
@@ -280,7 +280,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
               
             
               <li>
-                <a class="menuitem flat-box faa-parent animated-hover" href=/essay
+                <a class="menuitem flat-box faa-parent animated-hover" href=/essay/
                   
                   
                   
@@ -459,6 +459,9 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
       
         阅读此文，最好事先了解MySQL对SQL语句的执行流程。笔者后续会针对性地补充相关内容，敬请期待！
 
+
+统计信息简介了解过SQL语句执行流程的童鞋应该都知道，查询优化器会根据统计信息和代价模型计算每个执行计划的成本大小，从而选择成本最小的执行计划；总而言之，统计信息是决定最终explain所见的执行计划的一个重要因素！
+统计信息分成非持久化统计信息和持久化统计信息；统计信息可由MySQL专门...
       
     
   </div>
@@ -628,7 +631,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
     
   <header>
     
-      <a href='/blog/categories/'><i class="fas fa-folder-open fa-fw" aria-hidden="true"></i><span class='name'>文章分类</span></a>
+      <a href='/categories/'><i class="fas fa-folder-open fa-fw" aria-hidden="true"></i><span class='name'>文章分类</span></a>
     
   </header>
 
@@ -657,7 +660,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
     
   <header>
     
-      <a href='/blog/tags/'><i class="fas fa-tags fa-fw" aria-hidden="true"></i><span class='name'>热门标签</span></a>
+      <a href='/tags/'><i class="fas fa-tags fa-fw" aria-hidden="true"></i><span class='name'>热门标签</span></a>
     
   </header>
 
@@ -712,7 +715,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
       
         <div class="webinfo-item">
           <div>本站总字数：</div>
-          <div>1.4k 字</div>
+          <div>3.1k 字</div>
         </div>
       
 
@@ -738,8 +741,8 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
         <div class="webinfo-item">
           <div>最后活动时间：</div>
           
-            <div id="last-update" style="display: none;">Sun Jan 31 2021 23:06:55 GMT+0800 (GMT+08:00)</div>
-            <div id="last-update-show">2021/01/31 日</div>
+            <div id="last-update" style="display: none;">Thu Feb 04 2021 22:10:02 GMT+0800 (GMT+08:00)</div>
+            <div id="last-update-show">2021/02/04 日</div>
           
         </div>
         
@@ -789,7 +792,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
           try {
             document.getElementById('last-update-show').innerHTML = timeago(new Date(lastUpDate));
           } catch (error) {
-            document.getElementById('last-update-show').innerHTML = '2021/01/31 日';
+            document.getElementById('last-update-show').innerHTML = '2021/02/04 日';
           }
         </script>
         
