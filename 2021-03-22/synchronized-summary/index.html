@@ -22,9 +22,13 @@
 
   <!-- 页面元数据 -->
   
-  <title>JoruaChan技术博客</title>
+  <title>史上最全的synchronized关键字总结 - JoruaChan技术博客</title>
+  
+    <meta name="keywords" content="synchronized,关键字,多线程,Java面试复习">
   
 
+  
+    <meta name="description" content="这里应该可谓史上对synchronized关键字最全的总结了，笔者可谓呕心沥血的文章！不得不看！">
   
 
   <!-- feed -->
@@ -113,6 +117,8 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
       <p class="title"></p>
       <ul class='switcher nav-list-h m-phone' id="pjax-header-nav-list">
         <li><a id="s-comment" class="fas fa-comments fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+          <li><a id="s-toc" class="s-toc fas fa-list fa-fw" target="_self" href='javascript:void(0)'></a></li>
         
       </ul>
     </div>
@@ -343,7 +349,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
       <div id="l_cover">
   
     
-        <div id="full" class='cover-wrapper list dock' style="display: none;">
+        <div id="full" class='cover-wrapper post dock' style="display: none;">
           
             <div id='cover-backstretch'></div>
           
@@ -413,83 +419,300 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
         <div class="body-wrapper" id="pjax-container">
           
 
+<div class='l_main'>
+  <article class="article post white-box reveal md shadow article-type-post" id="post" itemscope itemprop="blogPost">
+  
 
-<div class='l_main no_sidebar'>
-  
-    <section class="post-list">
-      
-        
-      
-        
-      
-        
-      
-      
-        
-      
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021-01-30/mysql-stats-info/">
-        什么？MySQL还有统计信息一说？
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      
-        笔者最近在项目上对现有表进行了结构优化，并对一个常用表添加了索引。可谓测试环境玩漂移，生产环境怕翻车啊。上线验证的那一刻，突然发现一个类似报表功能的查询SQL极慢！
-背景说明
-故障简查
- 检查添加索引索引的SQL，查看SQL执行结果，检查DDL。一顿操作后，表象上没看出问题
 
-比较执行计划
- 连接sit环境执行explain，发现没问题，索引正常用上的。在生产的dbms上执行explain，...
-      
+  
+  <div class="article-meta" id="top">
     
+    
+    
+      <h1 class="title">
+        史上最全synchronized关键字总结
+      </h1>
+      <div class='new-meta-box'>
+        
+          
+            
+<div class='new-meta-item author'>
+  <a class='author' href="https://joruachan.cn" rel="nofollow">
+    <img no-lazy src="https://cdn.jsdelivr.net/gh/JoruaChan/joruachan.github.io/images/joruachan-avatar.jpg">
+    <p>JoruaChan</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt fa-fw" aria-hidden="true"></i>
+    <p>发布于：2021年3月22日</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class="new-meta-item browse leancloud">
+    <a class='notlink'>
+      
+      <div id="lc-pv" data-title="史上最全synchronized关键字总结" data-path="/2021-03-22/synchronized-summary/">
+        <i class="fas fa-eye fa-fw" aria-hidden="true"></i>
+        <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span>
+        次浏览
+      </div>
+    </a>
   </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
+
+
+          
         
-        <time>2021/01/30</time>
-        
-          <span class="dot"></span>
-          <a class="category-link" href="/categories/%E9%9A%8F%E7%AC%94/">随笔</a>
+          
+            
+  <div class="new-meta-item wordcount">
+    <a class='notlink'>
+      <i class="fas fa-keyboard fa-fw" aria-hidden="true"></i>
+      <p>字数：605字</p>
+    </a>
+  </div>
+  <div class="new-meta-item readtime">
+    <a class='notlink'>
+      <i class="fas fa-hourglass-half fa-fw" aria-hidden="true"></i>
+      <p>时长：2分钟</p>
+    </a>
+  </div>
+
+
+          
         
       </div>
+    
+  </div>
+
+
+  
+  
+  <p>文章编写思路：正式介绍synchronized关键字开始之前，我们回顾下理论知识：信号量。因为信号量是解决并发过程中互斥和同步问题的最基础的模型。然后再介绍管程模型，因为管程模型是针对信号量的一个改进模型。再介绍Java中是如何实现和使用管程模型的，最后介绍下Java对synchronized重量级锁的优化。</p>
+<h2 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h2><p>你的脑袋里，是不是还能蹦出共享资源、临界区、P方法、V方法等等字眼词汇？那说明你的课本知识还是很扎实的！</p>
+<p>信号量机制是由荷兰学者Dijkstra提出的进程同步工具，它被大量使用在处理机系统和计算机网络中！其中，包含了两个重要属性和两个重要的方法。</p>
+<p>PS：我这里介绍的内容，为了更好的理解经过了一定的加工，不完全和理论介绍一致！</p>
+<p>两个重要属性：</p>
+<ol>
+<li>count，共享资源数量，count &gt; 0，表示还存在共享资源可以获取，count &lt; 0则表示共享资源已经获取完了，只能等资源被释放；</li>
+<li>等待队列，当count &lt; 0时，线程需阻塞直到资源释放，这些线程需要加入到等待队列中；</li>
+</ol>
+<p>两个重要方法：</p>
+<ol>
+<li>P：获取资源，即对count-1，如果结果&gt;=0，则获取资源成功；但是结果&lt;0的话，线程则加入到等待队列并进入阻塞状态；</li>
+<li>V：释放资源，即对count+1，如果结果&gt;0，则不做特殊操作；但是结果&lt;=0，则表示有线程需要共享资源，则从等待队列中唤醒一个线程恢复执行；</li>
+</ol>
+<p>使用方法：</p>
+<ol>
+<li>只有P和V方法能操作count属性；</li>
+<li>P和V方法必须成对出现，否则对共享资源的控制不准确；</li>
+<li>P方法可能阻塞，但是不能无限期阻塞；</li>
+</ol>
+<p>死锁问题：<br>如果一段逻辑中存在多个信号量间的交互，有着很经典的问题：比如A和B间，A依赖着B，B又依赖着A，如果控制不合理，很容易造成死锁；</p>
+<h2 id="管程"><a href="#管程" class="headerlink" title="管程"></a>管程</h2><p>管程模型是在信号量的基础上改进的模型，可以很好地避免（并非完全避免）死锁问题；</p>
+
+  
+  
+    
+    <div class='footer'>
       
-        <div>
-          <a class='readmore' href='/2021-01-30/mysql-stats-info/'>
-            阅读全文
-          </a>
+      
+      
+        <div class='copyright'>
+          <blockquote>
+            
+              
+                <p>博客内容遵循 署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</p>
+
+              
+            
+              
+                <p>本文永久链接是：<a href=http://joruachan.cn/2021-03-22/synchronized-summary/>http://joruachan.cn/2021-03-22/synchronized-summary/</a></p>
+              
+            
+          </blockquote>
         </div>
+      
       
     </div>
   
+  
+    
 
+
+  <div class='article-meta' id="bottom">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-03-22T23:02:56+08:00">
+  <a class='notlink'>
+    <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
+    <p>更新于：2021年3月22日</p>
+  </a>
 </div>
 
-          </div>
         
       
         
-      
-    </section>
+          
   
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/Java%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0/" rel="nofollow"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i><p>Java面试复习</p></a></div> <div class="new-meta-item meta-tags"><a class="tag" href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="nofollow"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i><p>多线程</p></a></div>
+
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
+    
+      
+        <a class="-mob-share-qq" title="" rel="external nofollow noopener noreferrer noopener"
+          
+          target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://joruachan.cn/2021-03-22/synchronized-summary/&title=史上最全的synchronized关键字总结 - JoruaChan技术博客&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-qzone" title="" rel="external nofollow noopener noreferrer noopener"
+          
+          target="_blank" href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=http://joruachan.cn/2021-03-22/synchronized-summary/&title=史上最全的synchronized关键字总结 - JoruaChan技术博客&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="" rel="external nofollow noopener noreferrer noopener"
+          
+          target="_blank" href="http://service.weibo.com/share/share.php?url=http://joruachan.cn/2021-03-22/synchronized-summary/&title=史上最全的synchronized关键字总结 - JoruaChan技术博客&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+
+
+        
+      
+        
+          
+  <div class="new-meta-item wordcount">
+    <a class='notlink'>
+      <i class="fas fa-keyboard fa-fw" aria-hidden="true"></i>
+      <p>字数：605字</p>
+    </a>
+  </div>
+  <div class="new-meta-item readtime">
+    <a class='notlink'>
+      <i class="fas fa-hourglass-half fa-fw" aria-hidden="true"></i>
+      <p>时长：2分钟</p>
+    </a>
+  </div>
+
+
+        
+      
+    </div>
+  </div>
+
+
+  
+  
+
+  
+    <div class="prev-next">
+      
+      
+        <a class='next' href='/2021-01-31/mysql-stats-info-explore/'>
+          <p class='title'>MySQL统计信息研究<i class="fas fa-chevron-right" aria-hidden="true"></i></p>
+          <p class='content'>阅读此文，最好事先了解MySQL对SQL语句的执行流程。笔者后续会针对性地补充相关内容，敬请期待！
+
+
+统计信息简介了解过SQL语句执行流程的童鞋应该都知道，查询优化器会根据统计信息和代价模型计...</p>
+        </a>
+      
+    </div>
+  
+</article>
+
+
+  
+
+  <article class="post white-box reveal shadow" id="comments">
+    <p ct><i class='fas fa-comments'></i> 评论</p>
+    
+    <div id="valine_container" class="valine_thread">
+  <i class="fas fa-cog fa-spin fa-fw fa-2x"></i>
+</div>
+
+  </article>
+
+
+
+
+
+
 </div>
 <aside class='l_side'>
   
+  
+    
+    
+
+
+
+  <section class="widget toc-wrapper shadow desktop mobile" id="toc-div" >
+    
+  <header>
+    
+      <i class="fas fa-list fa-fw" aria-hidden="true"></i><span class='name'>本文目录</span>
+    
+  </header>
+
+
+    <div class='content'>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F"><span class="toc-text">信号量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%A1%E7%A8%8B"><span class="toc-text">管程</span></a></li></ol>
+    </div>
+  </section>
+
+
+  
+
 
 </aside>
+
 
 
 		  
@@ -498,8 +721,8 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
 
 <script>
   window.pdata={}
-  pdata.ispage=false;
-  pdata.postTitle="";
+  pdata.ispage=true;
+  pdata.postTitle="史上最全synchronized关键字总结";
   pdata.commentPath="";
   pdata.commentPlaceholder="";
 

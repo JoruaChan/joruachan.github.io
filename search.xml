@@ -4,6 +4,27 @@
   
     
     <entry>
+      <title>史上最全synchronized关键字总结</title>
+      <link href="2021-03-22/synchronized-summary/"/>
+      <url>2021-03-22/synchronized-summary/</url>
+      
+        <content type="html"><![CDATA[<p>文章编写思路：正式介绍synchronized关键字开始之前，我们回顾下理论知识：信号量。因为信号量是解决并发过程中互斥和同步问题的最基础的模型。然后再介绍管程模型，因为管程模型是针对信号量的一个改进模型。再介绍Java中是如何实现和使用管程模型的，最后介绍下Java对synchronized重量级锁的优化。</p><h2 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h2><p>你的脑袋里，是不是还能蹦出共享资源、临界区、P方法、V方法等等字眼词汇？那说明你的课本知识还是很扎实的！</p><p>信号量机制是由荷兰学者Dijkstra提出的进程同步工具，它被大量使用在处理机系统和计算机网络中！其中，包含了两个重要属性和两个重要的方法。</p><p>PS：我这里介绍的内容，为了更好的理解经过了一定的加工，不完全和理论介绍一致！</p><p>两个重要属性：</p><ol><li>count，共享资源数量，count &gt; 0，表示还存在共享资源可以获取，count &lt; 0则表示共享资源已经获取完了，只能等资源被释放；</li><li>等待队列，当count &lt; 0时，线程需阻塞直到资源释放，这些线程需要加入到等待队列中；</li></ol><p>两个重要方法：</p><ol><li>P：获取资源，即对count-1，如果结果&gt;=0，则获取资源成功；但是结果&lt;0的话，线程则加入到等待队列并进入阻塞状态；</li><li>V：释放资源，即对count+1，如果结果&gt;0，则不做特殊操作；但是结果&lt;=0，则表示有线程需要共享资源，则从等待队列中唤醒一个线程恢复执行；</li></ol><p>使用方法：</p><ol><li>只有P和V方法能操作count属性；</li><li>P和V方法必须成对出现，否则对共享资源的控制不准确；</li><li>P方法可能阻塞，但是不能无限期阻塞；</li></ol><p>死锁问题：<br>如果一段逻辑中存在多个信号量间的交互，有着很经典的问题：比如A和B间，A依赖着B，B又依赖着A，如果控制不合理，很容易造成死锁；</p><h2 id="管程"><a href="#管程" class="headerlink" title="管程"></a>管程</h2><p>管程模型是在信号量的基础上改进的模型，可以很好地避免（并非完全避免）死锁问题；</p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> Java面试复习 </tag>
+            
+            <tag> 多线程 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>MySQL统计信息研究</title>
       <link href="2021-01-31/mysql-stats-info-explore/"/>
       <url>2021-01-31/mysql-stats-info-explore/</url>
