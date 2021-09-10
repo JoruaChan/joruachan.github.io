@@ -481,13 +481,13 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
   <div class="new-meta-item wordcount">
     <a class='notlink'>
       <i class="fas fa-keyboard fa-fw" aria-hidden="true"></i>
-      <p>字数：1.4k字</p>
+      <p>字数：1.7k字</p>
     </a>
   </div>
   <div class="new-meta-item readtime">
     <a class='notlink'>
       <i class="fas fa-hourglass-half fa-fw" aria-hidden="true"></i>
-      <p>时长：5分钟</p>
+      <p>时长：6分钟</p>
     </a>
   </div>
 
@@ -501,12 +501,19 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
 
   
   
-  <p>文章编写思路：正式介绍synchronized关键字开始之前，我们回顾下理论知识：信号量。因为信号量是解决并发过程中互斥和同步问题的最基础的模型。然后再介绍管程模型，管程模型是针对信号量的一个改进模型。再介绍Java中是如何实现和使用管程模型的，最后介绍下Java对synchronized重量级锁的优化。</p>
+  <h2 id="文章思路"><a href="#文章思路" class="headerlink" title="文章思路"></a>文章思路</h2><p>我在阅读文章时，更希望文章有个提纲或者思路，在阅读前可以理解他的思路，这样能快速明白他想说什么，将要怎么说。</p>
+<p>本篇文章编写的思路：</p>
+<ol>
+<li>回顾下理论知识：信号量。因为信号量是解决并发过程中互斥和同步问题的最基础的模型;</li>
+<li>介绍管程模型，管程模型是针对信号量的一个改进模型;</li>
+<li>再介绍Java中是如何实现和使用管程模型的;</li>
+<li>最后介绍下Java对synchronized重量级锁的优化;</li>
+</ol>
 <h2 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h2><p>你的脑袋里，是不是还能蹦出共享资源、临界区、P方法、V方法等等字眼词汇？那说明你的课本知识还是很扎实的！</p>
 <p>信号量机制是由荷兰学者Dijkstra提出的进程同步工具，它被大量使用在处理机系统和计算机网络中！其中，包含了两个重要属性和两个重要的方法。</p>
 <p>PS：我这里介绍的内容，为了更好的理解经过了一定的加工，不完全和理论介绍一致！</p>
 <h3 id="两个重要属性"><a href="#两个重要属性" class="headerlink" title="两个重要属性"></a>两个重要属性</h3><ol>
-<li>count，共享资源数量，count &gt; 0，表示还存在共享资源可以获取，count &lt; 0则表示共享资源已经获取完了，只能等资源被释放；</li>
+<li>count，共享资源数量，count &gt; 0表示还存在共享资源可以获取，count &lt; 0则表示共享资源已经获取完了，只能等资源被释放；</li>
 <li>等待队列，当count &lt; 0时，线程需阻塞直到资源释放，这些线程需要加入到等待队列中；</li>
 </ol>
 <h3 id="两个重要方法"><a href="#两个重要方法" class="headerlink" title="两个重要方法"></a>两个重要方法</h3><ol>
@@ -518,9 +525,25 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
 <li>P和V方法必须成对出现，否则对共享资源的控制不准确；</li>
 <li>P方法可能阻塞，但是不能无限期阻塞；</li>
 </ol>
-<h3 id="死锁问题"><a href="#死锁问题" class="headerlink" title="死锁问题"></a>死锁问题</h3><p>如果一段逻辑中存在多个信号量间的交互，有着很经典的问题：比如A和B间，A依赖着B，B又依赖着A，如果控制不合理，很容易造成死锁；</p>
-<h2 id="管程"><a href="#管程" class="headerlink" title="管程"></a>管程</h2><p>管程模型是在信号量的基础上改进的模型，可以很好地避免（并非完全避免）死锁问题；</p>
-<h3 id="快速理解"><a href="#快速理解" class="headerlink" title="快速理解"></a>快速理解</h3><p>如上述，在信号量的模型中，一个共享变量需要一个信号量模型支持；如果存在多个共享变量，就需要多个信号量来支持。</p>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><ul>
+<li><p>易造成死锁</p>
+<p>  如果一段逻辑中存在多个信号量间的交互，有着很经典的问题：比如A和B间，A依赖着B，B又依赖着A，如果控制不合理，很容易造成死锁；</p>
+</li>
+<li><p>饥饿现象</p>
+<p>  调度器的不公平，会造成线程等待时间较长产生饥饿现象；</p>
+</li>
+<li><p>对程序员不友好</p>
+<p>  如果依靠信号量间来完成多个临界区的同步或者互斥，那么会有大量的P/V方法，难以维护；</p>
+</li>
+</ul>
+<h2 id="管程"><a href="#管程" class="headerlink" title="管程"></a>管程</h2><p>管程模型是在信号量的基础上改进的模型，很大程度上解决了上述信号量存在的问题，并且隐藏了很多同步细节。</p>
+<h3 id="改进点"><a href="#改进点" class="headerlink" title="改进点"></a>改进点</h3><p><strong>· 并发量提高</strong></p>
+<p>管程模型允许多个进（线）程先进入模型，再根据同步条件来判断是否能进入临界区；而信号量模型同一个信号量不论何种情况，都只能一个进（线）程进入；</p>
+<p><strong>· 条件队列（条件同步）</strong></p>
+<p>管程模型在信号量模型的基础上，添加了条件同步概念。通过使用条件队列，已经获得共享资源的进（线）程可以释放共享资源，并将进（线）程添加到条件队列中阻塞，一直等到某个条件成立，使得该进（线）程回到等待队列重新获取共享资源，再继续执行后续逻辑；具体的代码实现可以参考j.u.c中的Condition接口和具体实现；</p>
+<div class="img-wrap"><div class="img-bg"><img class="img lazyload" src="https://cdn.jsdelivr.net/gh/JoruaChan/BlogImages/synchronized-summary/compare-mointor-semaphere.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/JoruaChan/BlogImages/synchronized-summary/compare-mointor-semaphere.png" srcset="data:image/png;base64,666" alt="管程和信号量的比较，图片来自于网络"/></div><span class="image-caption">管程和信号量的比较，图片来自于网络</span></div>
+
+<h3 id="深入理解"><a href="#深入理解" class="headerlink" title="深入理解"></a>深入理解</h3><p>在信号量的模型中，一个共享变量需要一个信号量模型支持；如果存在多个共享变量，就需要多个信号量来支持。</p>
 <p>举例说明：两个共享资源A和B以及对应的信号量Sa和Sb；一个线程Ta利用Sa信号量的P方法获取到共享资源A，然后尝试获取共享资源B（未执行V方法）；另一个线程Tb在Ta获取到A的同时也获取到B，然后Tb又需要获取A。则最后的现象就是Ta需要等待Tb释放B，Tb在等Ta释放A，谁也不放过谁，而造成了死锁；具体可以参照伪代码理解：</p>
 <figure class="highlight plaintext"><figcaption><span>信号量死锁伪代码</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">Sa&#123;</span><br><span class="line">    int A;</span><br><span class="line">    P()&#123;</span><br><span class="line">        // 阻塞直到满足条件</span><br><span class="line">        if(--A &gt;= 0) &#123;</span><br><span class="line">            ... </span><br><span class="line">            Sb.P()</span><br><span class="line">            ... </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Sb&#123;</span><br><span class="line">    int B;</span><br><span class="line">    P()&#123;</span><br><span class="line">        // 阻塞直到满足条件</span><br><span class="line">        if(--B &gt;= 0) &#123;</span><br><span class="line">            ...</span><br><span class="line">            Sa.P()</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -528,10 +551,8 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
 <figure class="highlight plaintext"><figcaption><span>管程伪代码</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">Sa&#123;</span><br><span class="line">    int A;</span><br><span class="line">    P()&#123;</span><br><span class="line">        while(true)&#123;</span><br><span class="line">            if(获取共享资源A成功)&#123;</span><br><span class="line">                ... </span><br><span class="line">                while(true)&#123;</span><br><span class="line">                    if (获取共享资源B成功) &#123;</span><br><span class="line">                        ...</span><br><span class="line">                        // 唤起等待资源B的线程</span><br><span class="line">                        Sb.notify()</span><br><span class="line"></span><br><span class="line">                        break;</span><br><span class="line">                    &#125; else &#123;</span><br><span class="line">                        // 释放共享资源A的控制权</span><br><span class="line">                        Sa.wait()</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                ...</span><br><span class="line"></span><br><span class="line">                Sa.notify()    </span><br><span class="line">                break; </span><br><span class="line">            &#125; </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    wait()&#123; // 释放A的控制权 &#125;</span><br><span class="line"></span><br><span class="line">    notify()&#123; // 唤起等待A的线程 &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Sb&#123;</span><br><span class="line">    int B;</span><br><span class="line">    P()&#123;</span><br><span class="line">        while(true)&#123;</span><br><span class="line">            if(获取共享资源B成功)&#123;</span><br><span class="line">                ... </span><br><span class="line">                while(true)&#123;</span><br><span class="line">                    if (获取共享资源A成功) &#123;</span><br><span class="line">                        ...</span><br><span class="line">                        // 唤起等待资源A的线程</span><br><span class="line">                        Sa.notify()</span><br><span class="line"></span><br><span class="line">                        break;</span><br><span class="line">                    &#125; else &#123;</span><br><span class="line">                        // 释放共享资源B的控制权</span><br><span class="line">                        Sb.wait()</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                ...</span><br><span class="line"></span><br><span class="line">                Sb.notify()    </span><br><span class="line">                break; </span><br><span class="line">            &#125; </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    wait()&#123; // 释放B的控制权 &#125;</span><br><span class="line"></span><br><span class="line">    notify()&#123; // 唤起等待B的线程 &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>如上，通过wait和notify两个方法，可以很好地解决多个共享变量间的协调问题；</p>
-<h3 id="条件同步"><a href="#条件同步" class="headerlink" title="条件同步"></a>条件同步</h3><p>管程模型在信号量模型的基础上，添加了条件同步概念。通过使用条件队列，已经获得共享资源的线程可以释放共享资源，并将线程添加到条件队列中阻塞，一直等到某个条件成立，使得该线程回到等待队列重新获取共享资源，再继续执行后续逻辑；具体的代码实现可以参考j.u.c中的Condition接口和具体实现；</p>
-<div class="img-wrap"><div class="img-bg"><img class="img lazyload" src="https://cdn.jsdelivr.net/gh/JoruaChan/BlogImages/synchronized-summary/compare-mointor-semaphere.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/JoruaChan/BlogImages/synchronized-summary/compare-mointor-semaphere.png" srcset="data:image/png;base64,666" alt="管程和信号量的比较，图片来自于网络"/></div><span class="image-caption">管程和信号量的比较，图片来自于网络</span></div>
-
 <h3 id="MESA模型"><a href="#MESA模型" class="headerlink" title="MESA模型"></a>MESA模型</h3><p>管程的具体实现，当前最流行的就是MESA模型。它有个基本的编程范式：在一个while循环里面调用wait()，增加一个超时参数防止饥饿；</p>
+<p>除了MESA模型，还有Hoare模型和Brinch Hanson 模型，感兴趣的同学可以了解下。</p>
 <h2 id="synchronized底层原理"><a href="#synchronized底层原理" class="headerlink" title="synchronized底层原理"></a>synchronized底层原理</h2><h3 id="字节码表现"><a href="#字节码表现" class="headerlink" title="字节码表现"></a>字节码表现</h3><h3 id="ObjectMonitor——管程在JVM中的实现"><a href="#ObjectMonitor——管程在JVM中的实现" class="headerlink" title="ObjectMonitor——管程在JVM中的实现"></a>ObjectMonitor——管程在JVM中的实现</h3><p>管程在JVM中的具体实现是ObjectMonitor，可以参考源码：ObjectMonitor.cpp；主要的属性包含：</p>
 <ol>
 <li>_entryList：希望进入管程monitor对象，处于blocked状态的线程；</li>
@@ -571,10 +592,10 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
     <div class='new-meta-box'>
       
         
-          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-08-25T18:52:55+08:00">
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-09-10T23:39:15+08:00">
   <a class='notlink'>
     <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
-    <p>更新于：2021年8月25日</p>
+    <p>更新于：2021年9月10日</p>
   </a>
 </div>
 
@@ -645,13 +666,13 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
   <div class="new-meta-item wordcount">
     <a class='notlink'>
       <i class="fas fa-keyboard fa-fw" aria-hidden="true"></i>
-      <p>字数：1.4k字</p>
+      <p>字数：1.7k字</p>
     </a>
   </div>
   <div class="new-meta-item readtime">
     <a class='notlink'>
       <i class="fas fa-hourglass-half fa-fw" aria-hidden="true"></i>
-      <p>时长：5分钟</p>
+      <p>时长：6分钟</p>
     </a>
   </div>
 
@@ -723,7 +744,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
 
 
     <div class='content'>
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F"><span class="toc-text">信号量</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%A4%E4%B8%AA%E9%87%8D%E8%A6%81%E5%B1%9E%E6%80%A7"><span class="toc-text">两个重要属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%A4%E4%B8%AA%E9%87%8D%E8%A6%81%E6%96%B9%E6%B3%95"><span class="toc-text">两个重要方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95"><span class="toc-text">使用方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%BB%E9%94%81%E9%97%AE%E9%A2%98"><span class="toc-text">死锁问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%A1%E7%A8%8B"><span class="toc-text">管程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3"><span class="toc-text">快速理解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9D%A1%E4%BB%B6%E5%90%8C%E6%AD%A5"><span class="toc-text">条件同步</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MESA%E6%A8%A1%E5%9E%8B"><span class="toc-text">MESA模型</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#synchronized%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86"><span class="toc-text">synchronized底层原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%97%E8%8A%82%E7%A0%81%E8%A1%A8%E7%8E%B0"><span class="toc-text">字节码表现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ObjectMonitor%E2%80%94%E2%80%94%E7%AE%A1%E7%A8%8B%E5%9C%A8JVM%E4%B8%AD%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-text">ObjectMonitor——管程在JVM中的实现</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#synchronized%E9%94%81%E4%BC%98%E5%8C%96"><span class="toc-text">synchronized锁优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E5%A4%B4"><span class="toc-text">对象头</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%81%E7%9A%84%E7%A7%8D%E7%B1%BB"><span class="toc-text">锁的种类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%81%E7%9A%84%E5%8D%87%E7%BA%A7%E5%92%8C%E6%92%A4%E9%94%80"><span class="toc-text">锁的升级和撤销</span></a></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E7%AB%A0%E6%80%9D%E8%B7%AF"><span class="toc-text">文章思路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F"><span class="toc-text">信号量</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%A4%E4%B8%AA%E9%87%8D%E8%A6%81%E5%B1%9E%E6%80%A7"><span class="toc-text">两个重要属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%A4%E4%B8%AA%E9%87%8D%E8%A6%81%E6%96%B9%E6%B3%95"><span class="toc-text">两个重要方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95"><span class="toc-text">使用方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%AE%E9%A2%98"><span class="toc-text">问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%A1%E7%A8%8B"><span class="toc-text">管程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%B9%E8%BF%9B%E7%82%B9"><span class="toc-text">改进点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3"><span class="toc-text">深入理解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MESA%E6%A8%A1%E5%9E%8B"><span class="toc-text">MESA模型</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#synchronized%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86"><span class="toc-text">synchronized底层原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%97%E8%8A%82%E7%A0%81%E8%A1%A8%E7%8E%B0"><span class="toc-text">字节码表现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ObjectMonitor%E2%80%94%E2%80%94%E7%AE%A1%E7%A8%8B%E5%9C%A8JVM%E4%B8%AD%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-text">ObjectMonitor——管程在JVM中的实现</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#synchronized%E9%94%81%E4%BC%98%E5%8C%96"><span class="toc-text">synchronized锁优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E5%A4%B4"><span class="toc-text">对象头</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%81%E7%9A%84%E7%A7%8D%E7%B1%BB"><span class="toc-text">锁的种类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%81%E7%9A%84%E5%8D%87%E7%BA%A7%E5%92%8C%E6%92%A4%E9%94%80"><span class="toc-text">锁的升级和撤销</span></a></li></ol></li></ol>
     </div>
   </section>
 
