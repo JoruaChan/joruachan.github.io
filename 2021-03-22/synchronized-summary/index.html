@@ -481,13 +481,13 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
   <div class="new-meta-item wordcount">
     <a class='notlink'>
       <i class="fas fa-keyboard fa-fw" aria-hidden="true"></i>
-      <p>字数：2.7k字</p>
+      <p>字数：3.4k字</p>
     </a>
   </div>
   <div class="new-meta-item readtime">
     <a class='notlink'>
       <i class="fas fa-hourglass-half fa-fw" aria-hidden="true"></i>
-      <p>时长：10分钟</p>
+      <p>时长：12分钟</p>
     </a>
   </div>
 
@@ -554,7 +554,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
 <h3 id="MESA模型"><a href="#MESA模型" class="headerlink" title="MESA模型"></a>MESA模型</h3><p>管程的具体实现，当前最流行的就是MESA模型。它有个基本的编程范式：在一个while循环里面调用wait()，增加一个超时参数防止饥饿；</p>
 <p>除了MESA模型，还有Hoare模型和Brinch Hanson 模型，感兴趣的同学可以了解下。</p>
 <h2 id="synchronized底层原理"><a href="#synchronized底层原理" class="headerlink" title="synchronized底层原理"></a>synchronized底层原理</h2><h3 id="字节码表现"><a href="#字节码表现" class="headerlink" title="字节码表现"></a>字节码表现</h3><p>我们先来举个例子：</p>
-<figure class="highlight plaintext"><figcaption><span>SynchronizedTest.java</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public class SynchronizedTest &#123;</span><br><span class="line">	int count = 0;</span><br><span class="line"></span><br><span class="line">	// 普通方法</span><br><span class="line">	public void normalMethod() &#123;</span><br><span class="line">		count++;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	// 同步方法，只能锁住当前实例的对象</span><br><span class="line">	public synchronized void syncMethod() &#123;</span><br><span class="line">		count++;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	// 同步代码块，这里可以指定同步资源</span><br><span class="line">	public void syncCodeBlock() &#123;</span><br><span class="line">		synchronized(this) &#123;</span><br><span class="line">			count++;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><figcaption><span>SynchronizedTest.java</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SynchronizedTest</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 普通方法</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">normalMethod</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		count++;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 同步方法，只能锁住当前实例的对象</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">syncMethod</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		count++;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 同步代码块，这里可以指定同步资源</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">syncCodeBlock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">synchronized</span>(<span class="keyword">this</span>) &#123;</span><br><span class="line">			count++;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>这段代码很简单，一个普通的方法，一个同步方法，还有一个同步代码块。我们先通过javac编译成.class文件，再用javap查看其汇编指令，具体观察下如何运作的。</p>
 <figure class="highlight plaintext"><figcaption><span>汇编指令</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">Compiled from &quot;SynchronizedTest.java&quot;</span><br><span class="line">public class SynchronizedTest &#123;</span><br><span class="line">int count;</span><br><span class="line"></span><br><span class="line">public SynchronizedTest();</span><br><span class="line">Code:</span><br><span class="line">0: aload_0</span><br><span class="line">1: invokespecial #1                  // Method java/lang/Object.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">4: aload_0</span><br><span class="line">5: iconst_0</span><br><span class="line">6: putfield      #2                  // Field count:I</span><br><span class="line">9: return</span><br><span class="line"></span><br><span class="line">public void normalMethod();</span><br><span class="line">Code:</span><br><span class="line">0: aload_0</span><br><span class="line">1: dup</span><br><span class="line">2: getfield      #2                  // Field count:I</span><br><span class="line">5: iconst_1</span><br><span class="line">6: iadd</span><br><span class="line">7: putfield      #2                  // Field count:I</span><br><span class="line">10: return</span><br><span class="line"></span><br><span class="line">public synchronized void syncMethod();</span><br><span class="line">Code:</span><br><span class="line">0: aload_0</span><br><span class="line">1: dup</span><br><span class="line">2: getfield      #2                  // Field count:I</span><br><span class="line">5: iconst_1</span><br><span class="line">6: iadd</span><br><span class="line">7: putfield      #2                  // Field count:I</span><br><span class="line">10: return</span><br><span class="line"></span><br><span class="line">public void syncCodeBlock();</span><br><span class="line">Code:</span><br><span class="line">0: aload_0</span><br><span class="line">1: dup</span><br><span class="line">2: astore_1</span><br><span class="line">3: monitorenter</span><br><span class="line">4: aload_0</span><br><span class="line">5: dup</span><br><span class="line">6: getfield      #2                  // Field count:I</span><br><span class="line">9: iconst_1</span><br><span class="line">10: iadd</span><br><span class="line">11: putfield      #2                  // Field count:I</span><br><span class="line">14: aload_1</span><br><span class="line">15: monitorexit</span><br><span class="line">16: goto          24</span><br><span class="line">19: astore_2</span><br><span class="line">20: aload_1</span><br><span class="line">21: monitorexit</span><br><span class="line">22: aload_2</span><br><span class="line">23: athrow</span><br><span class="line">24: return</span><br><span class="line">Exception table:</span><br><span class="line">from    to  target type</span><br><span class="line">4    16    19   any</span><br><span class="line">19    22    19   any</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
@@ -577,11 +577,67 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
 <li>只有少量的线程抢占共享资源</li>
 </ul>
 <p>因为上面说到是由MutexLock实现的，不论多少个线程，哪怕只有一个线程在抢占时，也是需要锁住CPU核，从而造成资源浪费；所以MutexLock称之为重量级锁。Java 1.6后引入了偏向锁和轻量级锁，线程在较少的抢占情况下，无需通过MutexLock来获取锁；</p>
-<h3 id="对象头"><a href="#对象头" class="headerlink" title="对象头"></a>对象头</h3><h3 id="锁的种类"><a href="#锁的种类" class="headerlink" title="锁的种类"></a>锁的种类</h3><h3 id="锁的升级和撤销"><a href="#锁的升级和撤销" class="headerlink" title="锁的升级和撤销"></a>锁的升级和撤销</h3>
+<h3 id="对象头"><a href="#对象头" class="headerlink" title="对象头"></a>对象头</h3><p>一个Java对象在JVM中，分成三个区域：对象头、实例数据、对齐填充；</p>
+<ul>
+<li>实例数据：4个字节对齐，存储类的数据，包括父类属性，如果是数组还包括数据长度；</li>
+<li>对象头：一部分存储自身运行时数据，如GC年代、哈希码、锁信息等，在32/64位机器占用32/64位，官方称为<strong>Mark Word</strong>；另一部分则存储对象类型数据的指针，数组对象还需存储数组的长度；</li>
+<li>填充数据：JVM要求对象起始地址必须是8字节的倍数，仅为了对齐；</li>
+</ul>
+<p>JVM为了空间效率，Mark Word设计成非固定数据结构，以便存储更多数据；具体如下:</p>
+<div class="img-wrap"><div class="img-bg"><img class="img lazyload" src="https://cdn.jsdelivr.net/gh/JoruaChan/BlogImages/synchronized-summary/markword.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/JoruaChan/BlogImages/synchronized-summary/markword.png" srcset="data:image/png;base64,666" alt="MarkWord不同形式，图片源于网络"/></div><span class="image-caption">MarkWord不同形式，图片源于网络</span></div>
+
+<h3 id="锁的升级和撤销"><a href="#锁的升级和撤销" class="headerlink" title="锁的升级和撤销"></a>锁的升级和撤销</h3><p>上面其实已经说过，synchronized在未优化前，不论何种场景都是按照重量级锁进行互斥的；Java1.6后，JVM会根据不同的场景做了优化以及升级；</p>
+<p>上小节的图片中可以看到MarkWord会存在四种状态：无锁、偏向锁、轻量级锁以及重量级锁，按照这个顺序不断升级锁来适应不同的场景。<strong>注：synchronized不能降级！</strong></p>
+<h4 id="无锁升级成偏向锁"><a href="#无锁升级成偏向锁" class="headerlink" title="无锁升级成偏向锁"></a>无锁升级成偏向锁</h4><p>如果当前只有一个线程运行，此时只会加上偏向锁。具体过程是:</p>
+<ol>
+<li>线程会先查看MarkWord的锁标记位和偏向锁标记位，如果是无锁状态，则当前线程可获得偏向锁；</li>
+<li>通过CAS无锁的方式将MarkWord的偏向锁标记位修改为1，以及赋值当前线程ID；</li>
+</ol>
+<h4 id="偏向锁撤销，升级成轻量级锁"><a href="#偏向锁撤销，升级成轻量级锁" class="headerlink" title="偏向锁撤销，升级成轻量级锁"></a>偏向锁撤销，升级成轻量级锁</h4><p>如上，已经有一个线程A获得了偏向锁，此时又有一个线程B来获取锁：</p>
+<ol>
+<li>线程B会先查看MarkWord的锁标记位和偏向锁标记位，发现是偏向锁状态；</li>
+<li>判断偏向锁线程id是否为自己，如果是则已经获取；如果不是自己，则尝试通过CAS设置MarkWord，则需要发起撤销偏向锁；</li>
+<li>暂停线程A，解偏向锁并将线程id置为空，再恢复线程B；<strong>（此阶段会STW, 撤销完后MarkWord此时无锁状态）</strong></li>
+<li>线程A和B会竞争轻量级锁，都会先在自己的线程栈上分配空间并复制对象头的MarkWord作为Displaced MarkWord，A、B通过CAS无锁方式将对象头的Markword指向自己栈空间；</li>
+<li>只有一个线程能成功，该线程获得轻量级锁；</li>
+</ol>
+<h4 id="轻量级锁撤销，升级成重量级锁"><a href="#轻量级锁撤销，升级成重量级锁" class="headerlink" title="轻量级锁撤销，升级成重量级锁"></a>轻量级锁撤销，升级成重量级锁</h4><p>假设线程A获得轻量级锁，线程B未获取到；</p>
+<ol>
+<li>线程B会继续CAS尝试将Markword指向自己的DisplacedMarkWord；当尝试到一定次数后仍失败，则<strong>将锁膨胀修改成重量级锁，阻塞住</strong>；</li>
+<li>线程A会将对象头的MarkWord通过CAS修改恢复，释放锁，并唤醒线程B；</li>
+<li>此时对象头的锁标记位就是10了，即重量级锁。A和B就需要进行介绍的重量级锁的竞争了；</li>
+</ol>
+
   
   
     
     <div class='footer'>
+      
+        <div class='references'>
+          <section class='header'>
+            
+              <i class="fas fa-quote-left fa-fw" aria-hidden="true"></i>
+            
+            <span>参考资料</span>
+          </section>
+          <section class='body'>
+            <ul>
+              
+                <li>
+                  <a href="https://blog.csdn.net/javazejian/article/details/72828483" rel="external nofollow noopener noreferrer" target="_blank">
+                  深入理解Java并发之synchronized实现原理
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="/" rel="external nofollow noopener noreferrer" target="_blank">
+                  Java并发编程的艺术
+                  </a>
+                </li>
+              
+            </ul>
+          </section>
+        </div>
       
       
       
@@ -611,10 +667,10 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
     <div class='new-meta-box'>
       
         
-          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-09-12T22:49:05+08:00">
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-09-13T23:49:20+08:00">
   <a class='notlink'>
     <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
-    <p>更新于：2021年9月12日</p>
+    <p>更新于：2021年9月13日</p>
   </a>
 </div>
 
@@ -685,13 +741,13 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
   <div class="new-meta-item wordcount">
     <a class='notlink'>
       <i class="fas fa-keyboard fa-fw" aria-hidden="true"></i>
-      <p>字数：2.7k字</p>
+      <p>字数：3.4k字</p>
     </a>
   </div>
   <div class="new-meta-item readtime">
     <a class='notlink'>
       <i class="fas fa-hourglass-half fa-fw" aria-hidden="true"></i>
-      <p>时长：10分钟</p>
+      <p>时长：12分钟</p>
     </a>
   </div>
 
@@ -763,7 +819,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
 
 
     <div class='content'>
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E7%AB%A0%E6%80%9D%E8%B7%AF"><span class="toc-text">文章思路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F"><span class="toc-text">信号量</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%A4%E4%B8%AA%E9%87%8D%E8%A6%81%E5%B1%9E%E6%80%A7"><span class="toc-text">两个重要属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%A4%E4%B8%AA%E9%87%8D%E8%A6%81%E6%96%B9%E6%B3%95"><span class="toc-text">两个重要方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95"><span class="toc-text">使用方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%AE%E9%A2%98"><span class="toc-text">问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%A1%E7%A8%8B"><span class="toc-text">管程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%B9%E8%BF%9B%E7%82%B9"><span class="toc-text">改进点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3"><span class="toc-text">深入理解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MESA%E6%A8%A1%E5%9E%8B"><span class="toc-text">MESA模型</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#synchronized%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86"><span class="toc-text">synchronized底层原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%97%E8%8A%82%E7%A0%81%E8%A1%A8%E7%8E%B0"><span class="toc-text">字节码表现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ObjectMonitor%E2%80%94%E2%80%94%E7%AE%A1%E7%A8%8B%E5%9C%A8JVM%E4%B8%AD%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-text">ObjectMonitor——管程在JVM中的实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Mutex-Lock"><span class="toc-text">Mutex Lock</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#synchronized%E9%94%81%E4%BC%98%E5%8C%96"><span class="toc-text">synchronized锁优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E5%A4%B4"><span class="toc-text">对象头</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%81%E7%9A%84%E7%A7%8D%E7%B1%BB"><span class="toc-text">锁的种类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%81%E7%9A%84%E5%8D%87%E7%BA%A7%E5%92%8C%E6%92%A4%E9%94%80"><span class="toc-text">锁的升级和撤销</span></a></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E7%AB%A0%E6%80%9D%E8%B7%AF"><span class="toc-text">文章思路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F"><span class="toc-text">信号量</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%A4%E4%B8%AA%E9%87%8D%E8%A6%81%E5%B1%9E%E6%80%A7"><span class="toc-text">两个重要属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%A4%E4%B8%AA%E9%87%8D%E8%A6%81%E6%96%B9%E6%B3%95"><span class="toc-text">两个重要方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95"><span class="toc-text">使用方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%AE%E9%A2%98"><span class="toc-text">问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%A1%E7%A8%8B"><span class="toc-text">管程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%B9%E8%BF%9B%E7%82%B9"><span class="toc-text">改进点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3"><span class="toc-text">深入理解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MESA%E6%A8%A1%E5%9E%8B"><span class="toc-text">MESA模型</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#synchronized%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86"><span class="toc-text">synchronized底层原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%97%E8%8A%82%E7%A0%81%E8%A1%A8%E7%8E%B0"><span class="toc-text">字节码表现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ObjectMonitor%E2%80%94%E2%80%94%E7%AE%A1%E7%A8%8B%E5%9C%A8JVM%E4%B8%AD%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-text">ObjectMonitor——管程在JVM中的实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Mutex-Lock"><span class="toc-text">Mutex Lock</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#synchronized%E9%94%81%E4%BC%98%E5%8C%96"><span class="toc-text">synchronized锁优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E5%A4%B4"><span class="toc-text">对象头</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%81%E7%9A%84%E5%8D%87%E7%BA%A7%E5%92%8C%E6%92%A4%E9%94%80"><span class="toc-text">锁的升级和撤销</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%A0%E9%94%81%E5%8D%87%E7%BA%A7%E6%88%90%E5%81%8F%E5%90%91%E9%94%81"><span class="toc-text">无锁升级成偏向锁</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%81%8F%E5%90%91%E9%94%81%E6%92%A4%E9%94%80%EF%BC%8C%E5%8D%87%E7%BA%A7%E6%88%90%E8%BD%BB%E9%87%8F%E7%BA%A7%E9%94%81"><span class="toc-text">偏向锁撤销，升级成轻量级锁</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BD%BB%E9%87%8F%E7%BA%A7%E9%94%81%E6%92%A4%E9%94%80%EF%BC%8C%E5%8D%87%E7%BA%A7%E6%88%90%E9%87%8D%E9%87%8F%E7%BA%A7%E9%94%81"><span class="toc-text">轻量级锁撤销，升级成重量级锁</span></a></li></ol></li></ol></li></ol>
     </div>
   </section>
 
