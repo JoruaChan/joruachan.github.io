@@ -4,6 +4,56 @@
   
     
     <entry>
+      <title>tcpdump初体验</title>
+      <link href="/2021-11-02/tcpdump-essay/"/>
+      <url>/2021-11-02/tcpdump-essay/</url>
+      
+        <content type="html"><![CDATA[<ol><li>tcpdump命令抓取包</li><li>使用下载安装好的Wireshark软件打开</li><li>分析过滤你需要的包</li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 随笔 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机网络 </tag>
+            
+            <tag> 抓包 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>透彻理解RTP</title>
+      <link href="/2021-10-22/rtp-introduction/"/>
+      <url>/2021-10-22/rtp-introduction/</url>
+      
+        <content type="html"><![CDATA[<h2 id="RTP——实时传输协议"><a href="#RTP——实时传输协议" class="headerlink" title="RTP——实时传输协议"></a>RTP——实时传输协议</h2><p>RTP（Real-time Transport Protocol），实时传输协议；RTP协议在<a href="https://datatracker.ietf.org/doc/html/rfc3550">RFC 3550</a>文档中详细说明了在互联网上传递音频和视频的标准数据包格式。</p><p>它一开始被设计为一个多播协议，但后来被用在很多的单播应用中。RTP协议常用于流媒体系统、视频会议，使它成为IP电话产业的技术基础。</p><p>RTP协议通常是建立在UDP协议之上的，由于UDP面向数据报，是非可靠的，所以如果需要提高服务质量，则需要实现RTCP协议；通常RTP和RTCP是相邻的两个端口，偶数端口是RTP通信，偶数+1的奇数端口是RTCP通信；</p><h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><ol><li>多播音频会议，通过一个多播地址和一对端口（一个传输RTP，一个传输RTCP）来实现；</li><li>音视频会议，利用两个RTP会话传输，一个传视频数据，一个传音频数据。每个会话对应的RTCP都有CNAME，根据CNAME获取对应的音视频，并根据计时信息实现音视频同步；</li><li>翻译器，RTP级的中继系统。翻译器用在通过IP多播不能直接到达的用户区，例如发送者和接收者之间存在防火墙；</li><li>混合器，RTP级的中继系统。当与会者能接收的音频编码格式不一样，比如有一个与会者通过一条低速链路接入到高速会议，这时就要使用混合器。在进入音频数据格式需要变化的网络前，混合器将来自一个源或多个源的音频包进行重构，并把重构后的多个音频合并，采用另一种音频编码进行编码后，再转发这个新的RTP包。从一个混合器出来的所有数据包要用混合器作为它们的SSRC（同步源）来识别，可以通过CSRC表（贡献源列表）确认谈话者；</li></ol><h2 id="协议分层"><a href="#协议分层" class="headerlink" title="协议分层"></a>协议分层</h2><h3 id="传输层的子层"><a href="#传输层的子层" class="headerlink" title="传输层的子层"></a>传输层的子层</h3><div class="img-wrap"><div class="img-bg"><img class="img lazyload" src="https://cdn.jsdelivr.net/gh/JoruaChan/BlogImages/rtp-introduction/rtp-layer.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/JoruaChan/BlogImages/rtp-introduction/rtp-layer.png" srcset="data:image/png;base64,666" alt="图片源自网络"/></div><span class="image-caption">图片源自网络</span></div><p>由上图可以看出，RTP被划分在传输层，它建立在UDP上。同UDP协议一样，为了实现其实时传输功能，RTP也有固定的封装形式。</p><h3 id="开发者的”应用层”"><a href="#开发者的”应用层”" class="headerlink" title="开发者的”应用层”"></a>开发者的”应用层”</h3><p>对于开发者来说，RTP如同应用层，因为<strong><em>RTP的实现需要开发者自行完成</em></strong>；</p><h2 id="会话过程"><a href="#会话过程" class="headerlink" title="会话过程"></a>会话过程</h2><h3 id="确认好传输地址"><a href="#确认好传输地址" class="headerlink" title="确认好传输地址"></a>确认好传输地址</h3><p>当应用程序建立一个RTP会话时，应用程序将确定一对目的传输地址。目的传输地址由一个网络地址和一对端口组成，有两个端口：一个给RTP包，一个给RTCP包，使得RTP/RTCP数据能够正确发送。RTP数据发向偶数的UDP端口，而对应的控制信号RTCP数据发向相邻的奇数UDP端口（偶数的UDP端口＋1），这样就构成一个UDP端口对。</p><h3 id="发送过程（接收过程相反）"><a href="#发送过程（接收过程相反）" class="headerlink" title="发送过程（接收过程相反）"></a>发送过程（接收过程相反）</h3><ol><li>接收如麦克风、摄像头等设备处理后，得到音视频编码后的流媒体信息码流（如H.263），封装成RTP数据包；RTCP从上层接收控制信息，封装成RTCP控制包;</li><li>将RTP数据包发往UDP端口对中偶数端口；RTCP将RTCP控制包发往UDP端口对中的接收端口;</li></ol><h2 id="数字音频信号处理"><a href="#数字音频信号处理" class="headerlink" title="数字音频信号处理"></a>数字音频信号处理</h2><p>数字音频处理的大方向是把我们所听到的声音以数字的方式记录下来，让计算机进行处理；</p><h3 id="声音的产生和传播"><a href="#声音的产生和传播" class="headerlink" title="声音的产生和传播"></a>声音的产生和传播</h3><p>声音是通过震动产生的，震动迫使着空气震动，声音在空气中以波的形式传播，空气震动迫使你的耳骨膜震动，从而听到声音。</p><h3 id="声音的记录"><a href="#声音的记录" class="headerlink" title="声音的记录"></a>声音的记录</h3><p>震动耳骨膜能让人听到声音，那么用某个物体来模仿我们的耳骨膜来接收声音。例如：留声机中的振片就相当于人类的耳骨膜。</p><h3 id="模拟信号-amp-数字信号"><a href="#模拟信号-amp-数字信号" class="headerlink" title="模拟信号&amp;数字信号"></a>模拟信号&amp;数字信号</h3><p>声音的模拟信号是一段连续变化的波形；数字信号是将连续变化的波形转换成离散的数字信号；例如：振片接收的声音通过AD变换器转变为数字信号。</p><h3 id="模拟信号转数字信号"><a href="#模拟信号转数字信号" class="headerlink" title="模拟信号转数字信号"></a>模拟信号转数字信号</h3><p>模拟信号到数字信号分为3步：采样，量化，编码；</p><ul><li>采样：声音的模拟信号是一段连续的波形，数字信号是对波形采集样本得到的，一个点表示一个样本，采样所取得的数值是**<em>音频的模拟电压值**</em>；</li><li>量化：把电压值按照位数分级，每一区间统一为一个数值。<strong><em>用近似值来表示采样点的电压值</em></strong>，分级越多，数字音频质量就越高。通常电话语音用8位（256级）或CD用16位（65536级）；</li><li>编码：将模拟信号的量化值用二进制的方式进行编码；</li></ul><h2 id="PCM"><a href="#PCM" class="headerlink" title="PCM"></a>PCM</h2><p>脉冲编码调制，按照固定频率采样将声音从模拟信号转成数字信号，是**<em>未经压缩的采样数据裸流**</em>；该数据没有文件头和尾；WAV格式就是在PCM文件前面加了一个长44字节的文件头；</p><h3 id="两个重要指标"><a href="#两个重要指标" class="headerlink" title="两个重要指标"></a>两个重要指标</h3><ul><li>采样频率：数字信号对模拟信号的波形进行采样还原的频率，一定时间内采样频率越高，还原精度越高；（采样定理：用大于信号最高频率两倍的频率，对周期信号进行采样，可以保证完全重构原始信号）</li><li>量化精度：采样到的电压值会对该值量化成一个近似值；如果采取均匀量化，会导致信号失真，也就是弱信号恢复的差；所以，<em><strong>一般采用非均匀量化（弱信号密度大）或者提高量化精度；</strong></em></li></ul><h3 id="编码"><a href="#编码" class="headerlink" title="编码"></a>编码</h3><p>将量化得到的二进制数据进行压缩，即编码数据；一般采用的是样本内压缩，如将16it的样本数据压缩成8bit的PCM样本数据；主要用的压缩算法是a-law和mu-law；</p><h3 id="调制"><a href="#调制" class="headerlink" title="调制"></a>调制</h3><p>编码好的数据调制了才能播放，调制器会根据下节介绍的相关信息进行调制播放；</p><h2 id="计量单位和换算"><a href="#计量单位和换算" class="headerlink" title="计量单位和换算"></a>计量单位和换算</h2><ul><li>声道数：单/立体；</li><li>样本位数：一个样本的二进制位数；4/8/16/32bit;</li><li>采样频率: 一秒钟采样的次数，8kHz/11.025kHz/22.05kHz/16kHz/37.8kHz/44.1kHz/48kHz；</li><li>比特率： 样本位数 * 采样频率 * 声道数</li><li>帧率：FPS，帧/秒，每秒钟刷新的帧数；</li></ul><blockquote><p>Q：已知采样率16k，采样位宽16bit，单声道；求每帧的播放时间？每帧的数据大小？<br>A: 帧率50，则每帧播放时间：1s/50=20ms；再以每帧的时间20ms将1s等分50份，可得到每帧的样本数量：16000/50=320个；发送方压缩后每帧的数据大小：320*8bit=320byte；接收方解码后每帧640byte；</p></blockquote><h2 id="RTP数据包"><a href="#RTP数据包" class="headerlink" title="RTP数据包"></a>RTP数据包</h2><h3 id="RTP数据包组成"><a href="#RTP数据包组成" class="headerlink" title="RTP数据包组成"></a>RTP数据包组成</h3><p>RTP数据包 = UDP头部（8字节）+ RTP头部（标准12字节）+ Payload数据</p><h3 id="RTP包最大长度"><a href="#RTP包最大长度" class="headerlink" title="RTP包最大长度"></a>RTP包最大长度</h3><blockquote><p>MTU：链路层限制了数据帧的最大长度，以太网和802.3分别规定为1500字节和1492字节；</p></blockquote><p>在TCP/IP层，需要依据MTU对数据报进行分片，保证每片的长度小于MTU；由此可知：<br>TCP：1500 - 20（ip头）- 20（tcp头）- 4（RTP标志）= 1456<br>UDP：1500 - 14（以太网头）- 20 (ip头）- 8 (udp头） = 1458</p><p>所以，<strong>一个RTP数据包最多承载 1458 - 12 = 1446 字节长的有效负载</strong>。将payload数据放入MTU为1500字节的网络上，标准的12字节长的RTP头部数据包(1458 字节)中。<br>在实践中，如果通过Internet传输这些流量，这些流量会被封装或跨不同的传输层传输，<strong>一般保持payload负载长度在 1400 字节以下以确保安全</strong>。</p><h3 id="包的头部组成"><a href="#包的头部组成" class="headerlink" title="包的头部组成"></a>包的头部组成</h3><div class="img-wrap"><div class="img-bg"><img class="img lazyload" src="https://cdn.jsdelivr.net/gh/JoruaChan/BlogImages/rtp-introduction/rtp-header.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/JoruaChan/BlogImages/rtp-introduction/rtp-header.png" srcset="data:image/png;base64,666" alt="图片源自网络"/></div><span class="image-caption">图片源自网络</span></div><ul><li>版本号（V）：2比特，用来标志使用的RTP版本；</li><li>填充位（P）：1比特，如果该位置位的话，RTP包的尾部就包含附加的填充字节；</li><li>扩展位（X）：1比特，如果该位置位的话，RTP固定头部后面就跟有一个扩展头部；</li><li>CSRC计数器（CC）：4比特，含有固定头部后面跟着的CSRC的数目；</li><li>标记位（M）：1比特，该位的解释由配置文档（Profile）来承担；</li><li>载荷类型（PT）：7比特，标识了RTP载荷的类型，接收端用合适的解码器去解码并播放；</li><li>序列号（SN）：16比特，发送方在每发送完一个RTP包后就将该域的值增加1，接收方可以由该域检测包的丢失及恢复包序列，序列号的初始值是随机的；</li><li>时间戳：32比特，记录了该包中数据的第一个字节的采样时刻。在一次会话开始时，时间戳初始化成一个初始值。即使在没有信号发送时，时间戳的数值也要随时间而不断地增加（时间在流逝嘛）。时间戳是去除抖动和实现同步不可缺少的；</li><li>同步源标识符(SSRC)：32比特，同步源就是指RTP包流的来源，在同一个RTP会话中不能有两个相同的SSRC值，该标识符是随机选取的RFC1889推荐了MD5随机算法；</li><li>贡献源列表（CSRC List）：0～15项，每项32比特，用来标志对一个RTP混合器产生的新包有贡献的所有RTP包的源。由混合器将这些有贡献的SSRC标识符插入表中。SSRC标识符都被列出来，以便接收端能正确指出交谈双方的身份。</li></ul><p>整理时间有限，还未整理完全，后续补充跟进~~~</p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> RTP </tag>
+            
+            <tag> 网络协议 </tag>
+            
+            <tag> 计算机网络 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>再回首JDK</title>
       <link href="/2021-09-23/look-back-jdk/"/>
       <url>/2021-09-23/look-back-jdk/</url>
