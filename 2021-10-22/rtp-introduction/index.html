@@ -527,7 +527,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
 <li>量化：把电压值按照位数分级，每一区间统一为一个数值。<strong><em>用近似值来表示采样点的电压值</em></strong>，分级越多，数字音频质量就越高。通常电话语音用8位（256级）或CD用16位（65536级）；</li>
 <li>编码：将模拟信号的量化值用二进制的方式进行编码；</li>
 </ul>
-<h2 id="PCM"><a href="#PCM" class="headerlink" title="PCM"></a>PCM</h2><p>脉冲编码调制，按照固定频率采样将声音从模拟信号转成数字信号，是**<em>未经压缩的采样数据裸流**</em>；该数据没有文件头和尾；WAV格式就是在PCM文件前面加了一个长44字节的文件头；</p>
+<h2 id="PCM"><a href="#PCM" class="headerlink" title="PCM"></a>PCM</h2><p>脉冲编码调制，按照固定频率采样将声音从模拟信号转成数字信号，是 <strong><em>未经压缩的采样数据裸流</em></strong> ；该数据没有文件头和尾；WAV格式就是在PCM文件前面加了一个长44字节的文件头；</p>
 <h3 id="两个重要指标"><a href="#两个重要指标" class="headerlink" title="两个重要指标"></a>两个重要指标</h3><ul>
 <li>采样频率：数字信号对模拟信号的波形进行采样还原的频率，一定时间内采样频率越高，还原精度越高；（采样定理：用大于信号最高频率两倍的频率，对周期信号进行采样，可以保证完全重构原始信号）</li>
 <li>量化精度：采样到的电压值会对该值量化成一个近似值；如果采取均匀量化，会导致信号失真，也就是弱信号恢复的差；所以，<em><strong>一般采用非均匀量化（弱信号密度大）或者提高量化精度；</strong></em></li>
@@ -625,10 +625,10 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
     <div class='new-meta-box'>
       
         
-          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-11-04T00:30:57+08:00">
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-11-07T21:36:56+08:00">
   <a class='notlink'>
     <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
-    <p>更新于：2021年11月4日</p>
+    <p>更新于：2021年11月7日</p>
   </a>
 </div>
 
