@@ -24,7 +24,7 @@
 
   <!-- 页面元数据 -->
   
-  <title>归档：2021/3 - JoruaChan技术博客</title>
+  <title>标签：动态代理 - JoruaChan技术博客</title>
   
 
   
@@ -108,7 +108,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
   <body>
     
 
-<header id="l_header" class="l_header auto shadow blur " style='opacity: 0' >
+<header id="l_header" class="l_header auto shadow blur show" style='opacity: 0' >
   <div class='container'>
   <div id='wrapper'>
     <div class='nav-sub'>
@@ -347,7 +347,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
       <div id="l_cover">
   
     
-        <div id="half" class='cover-wrapper  dock' style="display: ;">
+        <div id="full" class='cover-wrapper  dock' style="display: none;">
           
             <div id='cover-backstretch'></div>
           
@@ -417,9 +417,11 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
         <div class="body-wrapper" id="pjax-container">
           
 
+
 <div class='l_main'>
-	
-		
+  
+    
+      
   <section class="post-list">
     
       
@@ -439,26 +441,36 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
   
     
     <h2 class="article-title" >
-      <a href="/2021-03-22/synchronized-summary/">
-        史上最全synchronized关键字总结
+      <a href="/2022-03-01/jdkproxy/">
+        动态代理
       </a>
     </h2>
   
   <div class='md'>
     
-      <p>这里应该可谓史上对synchronized关键字最全的总结了，笔者可谓呕心沥血的文章！不得不看！</p>
+      
+        问题引入
+如果不同接口，同方法名、同参数、不同返回值怎么代理的？
+如果接口整体一致但顺序不一致，使用的是同一个代理类吗？
+如果传入非接口类、重复接口类，会怎么处理？
+如果存在非公有的接口类，会怎么处理？
+Spring中，如果一个类实现了接口，AOP拦截了非接口方法，会怎么处理？
+Spring中，依赖注入一个被AOP拦截的实现类，会怎么处理？
+
+JDK动态代理Proxy.newProxyIns...
+      
     
   </div>
   
     <div class='meta-v3' line_style='solid'>
       <div>
         
-        <time>2021/03/22</time>
+        <time>2022/03/01</time>
         
       </div>
       
         <div>
-          <a class='readmore' href='/2021-03-22/synchronized-summary/'>
+          <a class='readmore' href='/2022-03-01/jdkproxy/'>
             阅读全文
           </a>
         </div>
@@ -478,7 +490,8 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
   
 
 
-	
+    
+  
 </div>
 <aside class='l_side'>
   
@@ -808,7 +821,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
 
   var l_header=document.getElementById("l_header");
   
-  l_header.classList.remove("show");
+  l_header.classList.add("show");
   
 </script>
 

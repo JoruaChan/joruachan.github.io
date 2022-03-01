@@ -4,6 +4,27 @@
   
     
     <entry>
+      <title>动态代理</title>
+      <link href="/2022-03-01/jdkproxy/"/>
+      <url>/2022-03-01/jdkproxy/</url>
+      
+        <content type="html"><![CDATA[<h2 id="问题引入"><a href="#问题引入" class="headerlink" title="问题引入"></a>问题引入</h2><ol><li>如果不同接口，同方法名、同参数、不同返回值怎么代理的？</li><li>如果接口整体一致但顺序不一致，使用的是同一个代理类吗？</li><li>如果传入非接口类、重复接口类，会怎么处理？</li><li>如果存在非公有的接口类，会怎么处理？</li><li>Spring中，如果一个类实现了接口，AOP拦截了非接口方法，会怎么处理？</li><li>Spring中，依赖注入一个被AOP拦截的实现类，会怎么处理？</li></ol><h2 id="JDK动态代理"><a href="#JDK动态代理" class="headerlink" title="JDK动态代理"></a>JDK动态代理</h2><h3 id="Proxy-newProxyInstance"><a href="#Proxy-newProxyInstance" class="headerlink" title="Proxy.newProxyInstance"></a>Proxy.newProxyInstance</h3><figure class="highlight java"><figcaption><span>Jdk创建代理类调用方法</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">newProxyInstance(ClassLoader loader, Class&lt;?&gt;[] interfaces, InvocationHandler h)</span><br></pre></td></tr></table></figure><h4 id="入参"><a href="#入参" class="headerlink" title="入参"></a>入参</h4><p>loader：指定类加载器；<br>interfaces：代理类实现的接口；<br>h：代理方法调用处理接口InvocationHandler；</p><h4 id="返参"><a href="#返参" class="headerlink" title="返参"></a>返参</h4><p>Object：Proxy子类，即生成的代理类；</p><h4 id="方法逻辑"><a href="#方法逻辑" class="headerlink" title="方法逻辑"></a>方法逻辑</h4><ul><li>第一步：权限校验；</li></ul><p>涉及到了三个类加载器：调用newProxyInstance方法的类的类加载器c1、指定加载代理类的加载器c2、接口所在的类加载器c3；主要是做三者间的权限校验；</p><p>校验类加载器间的权限，即Class#getClassLoader；如果c2是bootstrap类加载器，c1不是，要看c1有没有getClassLoader的权限；</p><p>校验接口所在包的访问权限，当前类加载器是否存在接口类所在package的访问权限。如果没有访问权限，即接口非公有，那么必须c1=c2=c3。<strong>公有的都是放在com.sun.proxy包中；</strong></p><ul><li>第二步：生成并缓存代理类Class对象；</li></ul><p>实际就是调用WeakCache#get方法获取；WeakCache可以理解成缓存代理类的容器，由两级ConcurrentHashMap实现缓存机制，完成代理类Class对象的获取；</p><p>第一级key是<strong>CacheKey对象，ClassLoader的弱引用对象</strong>；expungeStaleEntries()方法，会从ReferenceQueue.poll出CacheKey，并将弱引用对象从map中清除、将缓存的Class对象清除；</p><p>第二级key是Proxy.KeyFactory#apply返回的Key0,Key1,Key2,KeyX对象，0、1、2、x针对的是被代理接口的数量；<strong>这些Key其实是由被代理类的接口类集合组成的弱引用；每个对象都会作为弱引用；</strong></p><p>第二级value，在初始化的时刻会是WeakCache.Factory对象，当调用Factory#get方法得到Class（其实就是ProxyClassFactory#apply得到的对象）后，<strong>将Class对象包装成弱引用CacheValue，这个CacheValue会取代Factory作为第二级value；</strong>通过循环，保证最终拿到的肯定是CacheValue包装的Class对象。可以参考源码在并发和失败情况下的代码处理。</p><ul><li>第三步：生成代理对象；</li></ul><p>根据第二步得到的Class对象，获取Proxy(InvocationHandler h)的构造函数，通过反射生成代理对象；</p><h3 id="Proxy-ProxyClassFactory"><a href="#Proxy-ProxyClassFactory" class="headerlink" title="Proxy.ProxyClassFactory"></a>Proxy.ProxyClassFactory</h3><ol><li>校验</li></ol><p>通过Class.forName方法校验接口类能否被代理类加载器加载；是否接口有重复的；</p><ol start="2"><li>确认代理的包位置</li></ol><ul><li>接口都是public，放到com.sun.proxy包下面，访问修饰符为public final；</li><li>存在非public接口，校验非public接口是不是在同一个包，是则放入非公有接口类的包下，不是则抛异常；</li></ul><ol start="3"><li>生成字节码</li></ol><p>通过<strong>ProxyGenerator#generateProxyClass</strong>获取字节码的二进制数据；</p><ol start="4"><li>类加载</li></ol><p>通过<strong>Proxy#defineClass0本地方法</strong>，将字节码二进制数据加载成Class对象；</p><h3 id="ProxyGenerator"><a href="#ProxyGenerator" class="headerlink" title="ProxyGenerator"></a>ProxyGenerator</h3><p>ProxyGenerator，参数存的都是待生成代理类的修饰符、常量池、方法、参数；</p><h4 id="generateProxyClass静态方法"><a href="#generateProxyClass静态方法" class="headerlink" title="generateProxyClass静态方法"></a>generateProxyClass静态方法</h4><p><code>**public static byte**[] generateProxyClass(**final **String name,  Class&lt;?&gt;[] interfaces, **int **accessFlags)</code></p><p>通过ProxyGenerator生成字节码二进制数据，如果希望保留生成的二进制数据到文件中，可以指定JVM参数sun.misc.ProxyGenerator.saveGeneratedFiles为true；</p><h4 id="generateClassFile实例方法"><a href="#generateClassFile实例方法" class="headerlink" title="generateClassFile实例方法"></a>generateClassFile实例方法</h4><ol><li>添加ProxyMethod</li></ol><ul><li>添加Object的hashCode、equals、toString方法；（优先于代理类中的方法）</li><li>添加所有接口中的方法，生成ProxyMethod加入List中并到Map缓存，如果存在同签名、同返回值的方法则确认最大异常集合；</li></ul><ol start="2"><li>检查相同方法签名的代理方法；</li></ol><p>如果存在大于2个相同签名的方法，那么所有的返回类型都<strong>必须是引用类型（不可是基础类型！）</strong>，并且必须有一个可以<strong>作为其余所有返回类型的子类</strong>； </p><ol start="3"><li>添加字节码需要的方法信息、参数信息；</li></ol><ul><li>方法：类构造方法、代理方法（将ProxyMethod转成MethodInfo，用于生成class文件）、静态方法块（完成静态参数Method的初始化）；</li><li>参数：全部是private static修饰的所有代理方法对应的Method对象；即private static Method xxxxxx；</li></ul><ol start="4"><li>更新常量池的索引；</li></ol><p>代理类$Proxy、代理类父类Proxy、被代理的接口类；</p><ol start="5"><li>根据字节码规范生成class二进制数据；</li></ol><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>通过动态生成并缓存Proxy子类，代理所有接口中方法，方法内部调用InvocationHandler实例的invoke方法，传递被代理的Method。所以在InvocationHandler实现类的invoke方法中，要有被代理的实例，并且通过Method#invoke完成代理。InvocationHandler#invoke的返回值，应对应具体接口的返回值；</p><h2 id="Spring中JDK动态代理"><a href="#Spring中JDK动态代理" class="headerlink" title="Spring中JDK动态代理"></a>Spring中JDK动态代理</h2><h3 id="JdkDynamicAopProxy"><a href="#JdkDynamicAopProxy" class="headerlink" title="JdkDynamicAopProxy"></a>JdkDynamicAopProxy</h3><h3 id="使用注意事项"><a href="#使用注意事项" class="headerlink" title="使用注意事项"></a>使用注意事项</h3><ol><li>类只要实现接口，Spring就会使用JDK动态代理，不论Bean声明时候用的接口类还是实现类；</li><li>如果使用JDK代理，只能代理接口中定义的方法。因为通过JDK代理生成的类型是Proxy子类，是无法强转成实现类的，就无法完成代理；Proxy.newProxyInstance源码其实也分析了，生成的class代码里，只针对接口的方法生成了Method；</li><li>equals/hashCode方法，JdkDynamicAopProxy会处理；</li><li>如果类实现了接口，然后AOP拦截了该类的非接口方法，此时该对象会被创建JDK代理。但是此时没办法执行AOP的Adviced；因为JDK代理不会代理非接口方法。并且如果这个类被其他对象依赖，Spring启动会校验并报错！</li><li>由于JDK动态代理生成的是Proxy的子类，所以当使用了AOP相关功能时，依赖注入要注意不可以直接用实现类，而得改用接口+名字来找到具体Bean；或者强制使用Cglib生成子类代理；</li><li>如果方法的返回值是this自己，会将返回值改成代理！</li></ol>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> 动态代理 </tag>
+            
+            <tag> Java面试复习 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>《见识》读后感</title>
       <link href="/2022-01-23/after-reading-jianshi/"/>
       <url>/2022-01-23/after-reading-jianshi/</url>
@@ -35,9 +56,9 @@
       
         <tags>
             
-            <tag> Netty </tag>
-            
             <tag> Java面试复习 </tag>
+            
+            <tag> Netty </tag>
             
             <tag> 高并发 </tag>
             
@@ -108,9 +129,9 @@
       
         <tags>
             
-            <tag> JDK </tag>
-            
             <tag> 基础知识 </tag>
+            
+            <tag> JDK </tag>
             
         </tags>
       
@@ -186,6 +207,8 @@
             <tag> Java面试复习 </tag>
             
             <tag> 多线程 </tag>
+            
+            <tag> 基础知识 </tag>
             
         </tags>
       
