@@ -5,10 +5,6 @@
   <!-- SEO相关 -->
   
     
-      
-        <meta name="robots" content="index,follow">
-      
-    
   
   <!-- 渲染优化 -->
   <meta http-equiv='x-dns-prefetch-control' content='on' />
@@ -26,7 +22,9 @@
 
   <!-- 页面元数据 -->
   
-  <title>JoruaChan技术博客</title>
+  <title>Spring动态代理详解 - JoruaChan技术博客</title>
+  
+    <meta name="keywords" content="动态代理,JDK动态代理,Spring动态代理,动态代理源码分析">
   
 
   
@@ -110,7 +108,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
   <body>
     
 
-<header id="l_header" class="l_header auto shadow blur " style='opacity: 0' >
+<header id="l_header" class="l_header auto shadow blur show" style='opacity: 0' >
   <div class='container'>
   <div id='wrapper'>
     <div class='nav-sub'>
@@ -349,7 +347,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
       <div id="l_cover">
   
     
-        <div id="half" class='cover-wrapper  dock' style="display: ;">
+        <div id="full" class='cover-wrapper post dock' style="display: none;">
           
             <div id='cover-backstretch'></div>
           
@@ -420,563 +418,305 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
           
 
 <div class='l_main'>
+  <article class="article post white-box reveal md shadow article-type-post" id="post" itemscope itemprop="blogPost">
   
-  <section class="post-list">
-    
-      
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-      
+
+
+  
+  <div class="article-meta" id="top">
     
     
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
     
-    <h2 class="article-title" >
-      <a href="/2022-03-27/springproxy/">
+      <h1 class="title">
         Spring动态代理
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      
-        Spring中动态代理，实现方式有两种：Jdk动态代理、Cglib动态代理；而在SpringFramework中，又是AOP模块应用了动态代理的能力实现面向切面编程；
-问题引入
-Spring中，如果一个类实现了接口，AOP拦截了非接口方法，会怎么处理？
-Spring中，依赖注入一个被AOP拦截的实现类，会怎么处理？
-Spring如何启动AOP功能？ 
-Spring如何生成代理bean？ 
-S...
-      
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
+      </h1>
+      <div class='new-meta-box'>
         
-        <time>2022/03/27</time>
+          
+            
+<div class='new-meta-item author'>
+  <a class='author' href="https://joruachan.cn" rel="nofollow">
+    <img no-lazy src="https://cdn.jsdelivr.net/gh/JoruaChan/joruachan.github.io/images/joruachan-avatar.jpg">
+    <p>JoruaChan</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt fa-fw" aria-hidden="true"></i>
+    <p>发布于：2022年3月27日</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class="new-meta-item browse leancloud">
+    <a class='notlink'>
+      
+      <div id="lc-pv" data-title="Spring动态代理" data-path="/2022-03-27/springproxy/">
+        <i class="fas fa-eye fa-fw" aria-hidden="true"></i>
+        <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span>
+        次浏览
+      </div>
+    </a>
+  </div>
+
+
+          
+        
+          
+            
+  <div class="new-meta-item wordcount">
+    <a class='notlink'>
+      <i class="fas fa-keyboard fa-fw" aria-hidden="true"></i>
+      <p>字数：1.6k字</p>
+    </a>
+  </div>
+  <div class="new-meta-item readtime">
+    <a class='notlink'>
+      <i class="fas fa-hourglass-half fa-fw" aria-hidden="true"></i>
+      <p>时长：5分钟</p>
+    </a>
+  </div>
+
+
+          
         
       </div>
+    
+  </div>
+
+
+  
+  
+  <p>Spring中动态代理，实现方式有两种：Jdk动态代理、Cglib动态代理；而在SpringFramework中，又是AOP模块应用了动态代理的能力实现面向切面编程；</p>
+<h2 id="问题引入"><a href="#问题引入" class="headerlink" title="问题引入"></a>问题引入</h2><ol>
+<li>Spring中，如果一个类实现了接口，AOP拦截了非接口方法，会怎么处理？</li>
+<li>Spring中，依赖注入一个被AOP拦截的实现类，会怎么处理？</li>
+<li>Spring如何启动AOP功能？ </li>
+<li>Spring如何生成代理bean？ </li>
+<li>Spring IoC容器中，被代理的target在什么地方？</li>
+</ol>
+<h2 id="AOP（动态代理的实现）"><a href="#AOP（动态代理的实现）" class="headerlink" title="AOP（动态代理的实现）"></a>AOP（动态代理的实现）</h2><p>AOP，面向切面编程；只需要关注业务代码，抽取出重复的事务处理、日志记录、缓存等逻辑代码。</p>
+<h3 id="基础概念释义"><a href="#基础概念释义" class="headerlink" title="基础概念释义"></a>基础概念释义</h3><h4 id="Aspect切面"><a href="#Aspect切面" class="headerlink" title="Aspect切面"></a>Aspect切面</h4><p>我理解的切面，应该就是一种声明，声明AOP处理逻辑的集合。如@Aspect注解是声明切面， 包含了Pointcut、Advice等等；</p>
+<h4 id="JoinPoint连接点"><a href="#JoinPoint连接点" class="headerlink" title="JoinPoint连接点"></a>JoinPoint连接点</h4><p>连接点，可以理解成程序中方法调用的地方，也可以是异常处理的地方；</p>
+<h4 id="Advice通知"><a href="#Advice通知" class="headerlink" title="Advice通知"></a>Advice通知</h4><p>定义了在pointcut切点处的处理逻辑，同时也定义在切点执行的前或后或特殊情况进行拦截。主要有BeforeAdvice、AfterAdvice（AfterReturningAdvice、ThrowsAdvice）。另外还有继承Advice的拦截器Interceptor（拦截器和Advice的区别？？）</p>
+<h3 id="AOP联盟概念释义"><a href="#AOP联盟概念释义" class="headerlink" title="AOP联盟概念释义"></a>AOP联盟概念释义</h3><p>下图列出了，SpringFramework中Aop实现源代码。其中org.aopallicance包下面是AOP联盟定义的标准化接口，可以从maven public仓库自行依赖aopalliance.jar查看，会发现和Spring中引入的是一致的。</p>
+<div class="img-wrap"><div class="img-bg"><img class="img lazyload" src="https://cdn.jsdelivr.net/gh/JoruaChan/BlogImages/springproxy/springaop-directory.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/JoruaChan/BlogImages/springproxy/springaop-directory.png" srcset="data:image/png;base64,666" alt="SpringAop源码"/></div><span class="image-caption">SpringAop源码</span></div>
+
+<figure class="highlight xml"><figcaption><span>aop maven依赖</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>aopalliance<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>aopalliance<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="Interceptor-拦截器"><a href="#Interceptor-拦截器" class="headerlink" title="Interceptor 拦截器"></a>Interceptor 拦截器</h4><p>对Advice概念进一步细化。继承于Advice接口，表示以拦截的方式实现Advice；子接口MethodInterceptor方法拦截器、ConstructorInterceptor构造器拦截器，分别表示对方法和构造函数的拦截处理；</p>
+<h4 id="Invocation调用"><a href="#Invocation调用" class="headerlink" title="Invocation调用"></a>Invocation调用</h4><p>对Joinpoint概念进一步细化。继承于JoinPoint接口，调用连接点，即程序中的调用，表示可以被Interceptor拦截的连接点；子接口MethodInvocation方法调用连接点、ConstructorInvocation构造器调用连接点，分别表示方法、构造器被调用的连接点；</p>
+<h3 id="Spring-AOP概念释义"><a href="#Spring-AOP概念释义" class="headerlink" title="Spring AOP概念释义"></a>Spring AOP概念释义</h3><p>SpringAOP并不是自立门户，而是在AOP联盟基础上进行拓展封装；</p>
+<h4 id="Pointcut切点"><a href="#Pointcut切点" class="headerlink" title="Pointcut切点"></a>Pointcut切点</h4><p>Pointcut，joinpoint连接点集合，用通配、正则表达式来声明这些需要拦截的点；定义了Advice将要发生的地方；</p>
+<figure class="highlight java"><figcaption><span>Pointcut源码</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Pointcut</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* Return the ClassFilter for this pointcut.</span></span><br><span class="line"><span class="comment">* <span class="doctag">@return</span> the ClassFilter (never &#123;<span class="doctag">@code</span> null&#125;)</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function">ClassFilter <span class="title">getClassFilter</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 通过MethodMatcher来匹配被拦截的方法</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function">MethodMatcher <span class="title">getMethodMatcher</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* Canonical Pointcut instance that always matches.</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">Pointcut TRUE = TruePointcut.INSTANCE;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Advisor通知器"><a href="#Advisor通知器" class="headerlink" title="Advisor通知器"></a>Advisor通知器</h4><p>Advisor是Advice通知和Pointcut切点的集合，常用的Advisor是DefaultPointcutAdvisor；通过某个具体的Advisor就可以知道在某个方法、注解等切点做什么拦截处理；</p>
+<h4 id="Introduction-引入"><a href="#Introduction-引入" class="headerlink" title="Introduction 引入"></a>Introduction 引入</h4><p>见IntroductionInfo接口，其目的是为了给目标对象引入指定的接口，拓展代理时的逻辑，如状态校验、锁校验等。Advice、Interceptor以及Advisor都有Introduction的身影；</p>
+<ul>
+<li>DynamicIntroductionAdvice：其implementsInterface方法指定引入哪些接口；</li>
+<li>IntroductionInterceptor：继承接口MethodInterceptor、DynamicIntroductionAdvice，可以理解成当拦截了某个方法时候引入接口处理，而不是直接进行代理；</li>
+<li>DelegatingIntroductionInterceptor：实现IntroductionInterceptor的implementsInterface和invoke两个方法，通过构造函数传递引入的接口实现对象，默认为自己；</li>
+<li>DefaultIntroductionAdvisor：默认用于实现引入的Advisor，构造函数传入IntroductionInterceptor、引入的接口；</li>
+</ul>
+<p><strong><em>注意：</em></strong><em>Spring中默认情况是不会使用Introduction引入的，可以使用ProxyFactoryBean来封装对Introduction的创建！如果想给所有的Proxy都添加引入，直接声明IntroductionInterceptor类型的Bean即可。</em></p>
+<p><em>存疑：ProxyFactoryBean的interceptorName的作用和全局的Interceptor冲突吗？</em></p>
+<p>看这篇：<a target="_blank" rel="noopener" href="https://chova.blog.csdn.net/article/details/107283525">https://chova.blog.csdn.net/article/details/107283525</a></p>
+<h4 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h4><p>Spring没有实现AOP联盟的ConstructorInterceptor和ConstructorInvocation，所以<strong>Spring只支持方法调用的拦截，不支持构造器的拦截。（如果需要构造器、属性的拦截处理，需要考虑AspectJ来实现切面）</strong></p>
+<h3 id="AOP实现方式"><a href="#AOP实现方式" class="headerlink" title="AOP实现方式"></a>AOP实现方式</h3><h4 id="方法一：回调"><a href="#方法一：回调" class="headerlink" title="方法一：回调"></a>方法一：回调</h4><p>如Servlet中定义的Filter过滤器和Interceptor拦截器；</p>
+<h4 id="方法二：代理"><a href="#方法二：代理" class="headerlink" title="方法二：代理"></a>方法二：代理</h4><p>静态代理、动态代理；</p>
+<h2 id="Spring-AOP"><a href="#Spring-AOP" class="headerlink" title="Spring AOP"></a>Spring AOP</h2><h3 id="AnnotationAwareAspectJAutoProxyCreator"><a href="#AnnotationAwareAspectJAutoProxyCreator" class="headerlink" title="AnnotationAwareAspectJAutoProxyCreator"></a>AnnotationAwareAspectJAutoProxyCreator</h3><p>AnnotationAwareAspectJAutoProxyCreator，适用于使用@Aspect等注解声明切面的自动代理类。主要完成Advisor的解析、适配针对Bean的Advisor、生成Bean的代理对象；当然，很多功能是由父类定义和完成的，子类完成实现。其类继承关系如下图：</p>
+<div class="img-wrap"><div class="img-bg"><img class="img lazyload" src="https://cdn.jsdelivr.net/gh/JoruaChan/BlogImages/springproxy/annotationajapc.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/JoruaChan/BlogImages/springproxy/annotationajapc.png" srcset="data:image/png;base64,666" alt="AnnotationAwareAspectJAutoProxyCreator类关系"/></div><span class="image-caption">AnnotationAwareAspectJAutoProxyCreator类关系</span></div>
+
+<h4 id="如何解析成BeanDefinition注册到BeanFactory？"><a href="#如何解析成BeanDefinition注册到BeanFactory？" class="headerlink" title="如何解析成BeanDefinition注册到BeanFactory？"></a>如何解析成BeanDefinition注册到BeanFactory？</h4><p>BeanDefinitionParserDelegate#parseCustomElement方法中，会通过DefaultNamespaceHandlerResolver #resolve，实例化AopNamespaceHandler，再通过init()方法实例化AOP相关的解析器，如<strong>AspectJAutoProxyBeanDefinitionParser</strong>；</p>
+<p>AspectJAutoProxyBeanDefinitionParser会解析并得到名字为“org.springframework.aop .config.internalAutoProxyCreator”的BeanDefinition，并添加proxyTargetClass和exposeProxy属性；</p>
+<p><strong><em>注意：</em></strong><em>如果定义了多个，最终只有一个能使用。按照AnnotationAwareAspectJAutoProxyCreator &gt;&gt; AspectJAwareAdvisorAutoProxyCreator &gt;&gt; InfrastructureAdvisorAutoProxyCreator的优先级进行注册；</em></p>
+<h4 id="何时-amp-如何实例化？"><a href="#何时-amp-如何实例化？" class="headerlink" title="何时&amp;如何实例化？"></a>何时&amp;如何实例化？</h4><p>AbstractApplicationContext#registerBeanPostProcessors方法中，会通过工具类的静态方法PostProcessorRegistrationDelegate#registerBeanPostProcessors来实例化并注册所有的BeanPostProcessor；AnnotationAwareAspectJAutoProxyCreator就是一个BeanPostProcessor。</p>
+<h4 id="如何解析Advisor？"><a href="#如何解析Advisor？" class="headerlink" title="如何解析Advisor？"></a>如何解析Advisor？</h4><ol>
+<li>获取所有Advisor：当getBean时，会执行AnnotationAwareAspectJAutoProxyCreator这个BeanPostProcessor的postProcessAfterInitialization方法，主要是执行AbstractAutoProxyCreator的wrapIfNecessary()方法；通过<strong>AbstractAdvisorAutoProxyCreator#findCandidateAdvisors</strong>得到全局的Advisor集合；</li>
+<li>找到适合增强Bean的Advisor：调用**AbstractAdvisorAutoProxyCreator#findAdvisorsThatCanApply()**找到适合增强这个Bean的Advisor；</li>
+</ol>
+<p>获取所有的Advisor：</p>
+<ul>
+<li><strong>BeanFactoryAdvisorRetrievalHelper</strong>，从BeanFactory中找到所有Advisor类型的Bean，findAdvisorBeans()首次会从IoC容器中找到所有的Advisor（按照beanName作为缓存，而不是直接用Bean缓存，应该是为了适应每个Bean的作用域把），再根据所有的beanName循环调用getBean()，返回getBean得到的Advisor对象；</li>
+<li><strong>BeanFactoryAspectJAdvisorBuilder</strong>，遍历所有注册的Bean，并获取被@Aspect注解的类进行解析，得到所有的Advisor类型的Bean对象；buildAspectJAdvisors()首次会扫描所有注册的Bean找到Aspect相关类，解析@Aspect类得到Advisor Bean对象；如果bean是单例则直接缓存Advisor对象，如果不是则缓存工厂；</li>
+</ul>
+<h4 id="类关系？"><a href="#类关系？" class="headerlink" title="类关系？"></a>类关系？</h4><div class="img-wrap"><div class="img-bg"><img class="img lazyload" src="https://cdn.jsdelivr.net/gh/JoruaChan/BlogImages/springproxy/springproxyclasses.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/JoruaChan/BlogImages/springproxy/springproxyclasses.png" srcset="data:image/png;base64,666" alt="AutoProxyCreator的类关系"/></div><span class="image-caption">AutoProxyCreator的类关系</span></div>
+
+<h4 id="如何生成代理对象？"><a href="#如何生成代理对象？" class="headerlink" title="如何生成代理对象？"></a>如何生成代理对象？</h4><p>（在整个Bean生命周期如何运作的？在循环依赖问题中如何应用的？）<br>Advisor类型的对象何时且如何注入并生成的？Aspect具体是如何根据Bean找到Advisor的（BeanFactoryAspectAdvisorsBuilder）？</p>
+<h3 id="MethodInvocation"><a href="#MethodInvocation" class="headerlink" title="MethodInvocation"></a>MethodInvocation</h3><p>ProxyMethodInvocation、ReflectiveMethodInvocation</p>
+<h3 id="MethodInterceptor"><a href="#MethodInterceptor" class="headerlink" title="MethodInterceptor"></a>MethodInterceptor</h3><p>IntroductionInterceptor</p>
+<h3 id="执行逻辑（原理）"><a href="#执行逻辑（原理）" class="headerlink" title="执行逻辑（原理）"></a>执行逻辑（原理）</h3><h2 id="Spring-AOP与AspectJ的关系"><a href="#Spring-AOP与AspectJ的关系" class="headerlink" title="Spring AOP与AspectJ的关系"></a>Spring AOP与AspectJ的关系</h2>
+  
+  
+    
+    <div class='footer'>
       
-        <div>
-          <a class='readmore' href='/2022-03-27/springproxy/'>
-            阅读全文
-          </a>
+      
+      
+        <div class='copyright'>
+          <blockquote>
+            
+              
+                <p>博客内容遵循 署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</p>
+
+              
+            
+              
+                <p>本文永久链接是：<a href=http://joruachan.cn/2022-03-27/springproxy/>http://joruachan.cn/2022-03-27/springproxy/</a></p>
+              
+            
+          </blockquote>
         </div>
+      
       
     </div>
   
+  
+    
 
+
+  <div class='article-meta' id="bottom">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2022-03-27T23:36:26+08:00">
+  <a class='notlink'>
+    <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
+    <p>更新于：2022年3月27日</p>
+  </a>
 </div>
 
-          </div>
         
       
         
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
+          
   
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2022-03-01/jdkproxy/">
-        JDK动态代理
-      </a>
-    </h2>
-  
-  <div class='md'>
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" rel="nofollow"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i><p>动态代理</p></a></div> <div class="new-meta-item meta-tags"><a class="tag" href="/tags/Java%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0/" rel="nofollow"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i><p>Java面试复习</p></a></div> <div class="new-meta-item meta-tags"><a class="tag" href="/tags/Spring/" rel="nofollow"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i><p>Spring</p></a></div>
+
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
     
       
-        问题引入
+        <a class="-mob-share-qq" title="" rel="external nofollow noopener noreferrer noopener"
+          
+          target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://joruachan.cn/2022-03-27/springproxy/&title=Spring动态代理详解 - JoruaChan技术博客&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-qzone" title="" rel="external nofollow noopener noreferrer noopener"
+          
+          target="_blank" href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=http://joruachan.cn/2022-03-27/springproxy/&title=Spring动态代理详解 - JoruaChan技术博客&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="" rel="external nofollow noopener noreferrer noopener"
+          
+          target="_blank" href="http://service.weibo.com/share/share.php?url=http://joruachan.cn/2022-03-27/springproxy/&title=Spring动态代理详解 - JoruaChan技术博客&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+
+
+        
+      
+        
+          
+  <div class="new-meta-item wordcount">
+    <a class='notlink'>
+      <i class="fas fa-keyboard fa-fw" aria-hidden="true"></i>
+      <p>字数：1.6k字</p>
+    </a>
+  </div>
+  <div class="new-meta-item readtime">
+    <a class='notlink'>
+      <i class="fas fa-hourglass-half fa-fw" aria-hidden="true"></i>
+      <p>时长：5分钟</p>
+    </a>
+  </div>
+
+
+        
+      
+    </div>
+  </div>
+
+
+  
+  
+
+  
+    <div class="prev-next">
+      
+      
+        <a class='next' href='/2022-03-01/jdkproxy/'>
+          <p class='title'>JDK动态代理<i class="fas fa-chevron-right" aria-hidden="true"></i></p>
+          <p class='content'>问题引入
 如果不同接口，同方法名、同参数、不同返回值怎么代理的？
 如果接口整体一致但顺序不一致，使用的是同一个代理类吗？
 如果传入非接口类、重复接口类，会怎么处理？
-如果存在非公有的接口类，会怎么处理？
-
-JDK动态代理Proxy.newProxyInstanceJdk创建代理类调用方法1newProxyInstance(ClassLoader loader, Class&lt;?&gt;[...
-      
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2022/03/01</time>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2022-03-01/jdkproxy/'>
-            阅读全文
-          </a>
-        </div>
+如果存在非公有的接口类，会怎...</p>
+        </a>
       
     </div>
   
+</article>
 
+
+  
+
+  <article class="post white-box reveal shadow" id="comments">
+    <p ct><i class='fas fa-comments'></i> 评论</p>
+    
+    <div id="valine_container" class="valine_thread">
+  <i class="fas fa-cog fa-spin fa-fw fa-2x"></i>
 </div>
 
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2022-01-23/after-reading-jianshi/">
-        《见识》读后感
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      
-        第二章 人生需要做减法西瓜与芝麻内容精采
-
-社会上太多捡芝麻的人，不仅时间利用得没有效率，而且渐渐习惯于非常低层次的追求！如花大量的时间或精力来捡芝麻；
-公司和个人一样，专注西瓜去捡，目光放得更长远；
-聚焦”练就捡西瓜的能力”，从同事中脱颖而出；
-致力于捡西瓜，那就要耐得住寂寞；
-
-我的想法
-
-做哪些：有时候，想做的事情太多了，但是每个人自己除了工作外，可用时间是数得过来的。不妨把你想做的事...
-      
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2022/01/23</time>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2022-01-23/after-reading-jianshi/'>
-            阅读全文
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-    <div class='headimg-div'>
-      <a class='headimg-a' href="/2021-11-07/netty-daily/">
-        <img class='headimg' src='https://cdn.jsdelivr.net/gh/JoruaChan/BlogImages/netty-daily/cover.png'/>
-      </a>
-    </div>
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021-11-07/netty-daily/">
-        Netty日记
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      
-        2021年11月6日Linux I/O
-只有内核能与外设交互，且内核将外设的操作都视作文件操作；对文件的操作，内核都会返回fd文件描述符；对socket的读写也有对应的socket fd；
-五种IO模型：阻塞IO、非阻塞IO、IO复用、信号驱动、异步IO；
-
-五种IO模型总结：
-
-所有IO操作，都包含：内核等待数据准备好、内核拷贝数据到用户空间；
-除了异步IO，其他四种模型在拷贝期间，进程都...
-      
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021/11/07</time>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021-11-07/netty-daily/'>
-            阅读全文
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021-11-02/tcpdump-essay/">
-        tcpdump初体验
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      
-        
-tcpdump命令抓取包
-使用下载安装好的Wireshark软件打开
-分析过滤你需要的包
+  </article>
 
 
-      
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021/11/02</time>
-        
-          <span class="dot"></span>
-          <a class="category-link" href="/categories/%E9%9A%8F%E7%AC%94/">随笔</a>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021-11-02/tcpdump-essay/'>
-            阅读全文
-          </a>
-        </div>
-      
-    </div>
-  
 
-</div>
 
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021-10-22/rtp-introduction/">
-        透彻理解RTP
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      
-        RTP——实时传输协议RTP（Real-time Transport Protocol），实时传输协议；RTP协议在RFC 3550文档中详细说明了在互联网上传递音频和视频的标准数据包格式。
-它一开始被设计为一个多播协议，但后来被用在很多的单播应用中。RTP协议常用于流媒体系统、视频会议，使它成为IP电话产业的技术基础。
-RTP协议通常是建立在UDP协议之上的，由于UDP面向数据报，是非可靠...
-      
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021/10/22</time>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021-10-22/rtp-introduction/'>
-            阅读全文
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021-09-23/look-back-jdk/">
-        再回首JDK
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      
-        如果你是刚要被Java军训的新兵，可有几时对环境搭建而不知所措？又如若你是驰骋Java战场多年的老将，可曾拿起陪伴你许久的82年的JDK回味一番？今天我们就来道一道JDK，重新来认识认识这个既熟悉又陌生的伙伴。
-既然要唠唠JDK，首先想到的，肯定是要了解下都是谁来推进Java和JDK发展的。
-Java发展的会议与组织说起Java的起源必定要提起Sun公司，由其发起了专属于Java的JavaO...
-      
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021/09/23</time>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021-09-23/look-back-jdk/'>
-            阅读全文
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021-09-15/the-first-time-2-meet-disruptor/">
-        disruptor初次见面
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      
-        每每复习Java数据结构时候，总感觉在队列中找不到一个适合高并发场景的队列。JDK提供的队列模型不尽人意，那么今天将要像大家简单介绍下：
-Disruptor，一个适用于多线程间高并发交换数据的有界队列；
-简单说几点，就能体现Disruptor的神奇：
-
-在并发情况下，普通的内存队列处理速度，和IO速度处于同一个数量级；
-基于Disruptor开发的系统单线程能支撑每秒600万订单；
-生产者消...
-      
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021/09/15</time>
-        
-          <span class="dot"></span>
-          <a class="category-link" href="/categories/%E9%9A%8F%E7%AC%94/">随笔</a>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021-09-15/the-first-time-2-meet-disruptor/'>
-            阅读全文
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021-09-07/half-of-2021/">
-        这是我的一半2021
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      
-        这篇文章起笔时间，2021年9月7日晚上。 
-间隔上篇博文，又过去了5个多月。中间发生了很多事，似乎明白了很多，让我坚定了很多选择；但是似乎又增添了不少疑惑，疑惑那些打破我认知的事情。不要觉得我矫情，也许你们觉得很正常，于我来说，可能正在经历生活、职场等等方面的历练。
-简单说下吧。
-
-婚姻，我们在三年恋爱后，终于————我迎娶她成为了丈夫，她嫁给我成为了妻子；感谢有她，庆幸有她！
-新房，房子...
-      
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021/09/07</time>
-        
-          <span class="dot"></span>
-          <a class="category-link" href="/categories/%E9%9A%8F%E4%BE%BF%E8%81%8A%E8%81%8A/">随便聊聊</a>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021-09-07/half-of-2021/'>
-            阅读全文
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021-03-22/synchronized-summary/">
-        史上最全synchronized关键字总结
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      <p>这里应该可谓史上对synchronized关键字最全的总结了，笔者可谓呕心沥血的文章！不得不看！</p>
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021/03/22</time>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021-03-22/synchronized-summary/'>
-            阅读全文
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-    
-  </section>
-  
-    
-      <br>
-      <div class="prev-next">
-        
-        <p class="current">
-          1 / 2
-        </p>
-        
-          <a class="next" rel="next" href="/page/2/">
-            <section class="post next white-box shadow">
-              &nbsp;下一页&nbsp;<i class="fas fa-chevron-right" aria-hidden="true"></i>
-            </section>
-          </a>
-        
-      </div>
-    
-  
 
 
 </div>
@@ -986,308 +726,22 @@ Disruptor，一个适用于多线程间高并发交换数据的有界队列；
     
     
 
-<section class="widget blogger shadow desktop mobile">
-  <div class='content'>
-    
-      
-        <a class='avatar flat-box rectangle' href='/about/'>
-          <img no-lazy src='https://cdn.jsdelivr.net/gh/JoruaChan/joruachan.github.io/images/joruachan-avatar.jpg'/>
-        </a>
-      
-    
-    
-      <div class='text'>
-        
-          <h2>JoruaChan</h2>
-        
-        
-          <p>心有猛虎，细嗅蔷薇</p>
 
-        
-        
-      </div>
-    
-    
-      <div class="social-wrapper">
-        
-          
-            <a href="/atom.xml"
-              class="social fas fa-rss flat-btn"
-              target="_blank"
-              rel="external nofollow noopener noreferrer">
-              
-            </a>
-          
-        
-          
-            <a href="mailto:joruachan@gmail.com"
-              class="social fas fa-envelope flat-btn"
-              target="_blank"
-              rel="external nofollow noopener noreferrer">
-              
-            </a>
-          
-        
-          
-            <a href="https://github.com/JoruaChan"
-              class="social fab fa-github flat-btn"
-              target="_blank"
-              rel="external nofollow noopener noreferrer">
-              
-            </a>
-          
-        
-          
-            <a href="/"
-              class="social fas fa-headphones-alt flat-btn"
-              target="_blank"
-              rel="external nofollow noopener noreferrer">
-              
-            </a>
-          
-        
-      </div>
-    
-  </div>
-</section>
 
-  
-
-  
-    
-    
-  
-
-  <section class="widget category shadow desktop">
+  <section class="widget toc-wrapper shadow desktop mobile" id="toc-div" >
     
   <header>
     
-      <a href='/categories/'><i class="fas fa-folder-open fa-fw" aria-hidden="true"></i><span class='name'>文章分类</span></a>
+      <i class="fas fa-list fa-fw" aria-hidden="true"></i><span class='name'>本文目录</span>
     
   </header>
 
 
     <div class='content'>
-      <ul class="entry navigation">
-        
-          <li><a class="flat-box"
-            title="/categories/%E9%9A%8F%E4%BE%BF%E8%81%8A%E8%81%8A/" href="/categories/%E9%9A%8F%E4%BE%BF%E8%81%8A%E8%81%8A/"
-            id="categoriesE99A8FE4BEBFE8818AE8818A"
-            ><div class='name'>随便聊聊</div><div class='badge'>(1)</div></a></li>
-        
-          <li><a class="flat-box"
-            title="/categories/%E9%9A%8F%E7%AC%94/" href="/categories/%E9%9A%8F%E7%AC%94/"
-            id="categoriesE99A8FE7AC94"
-            ><div class='name'>随笔</div><div class='badge'>(3)</div></a></li>
-        
-      </ul>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E5%BC%95%E5%85%A5"><span class="toc-text">问题引入</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AOP%EF%BC%88%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%89"><span class="toc-text">AOP（动态代理的实现）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5%E9%87%8A%E4%B9%89"><span class="toc-text">基础概念释义</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Aspect%E5%88%87%E9%9D%A2"><span class="toc-text">Aspect切面</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#JoinPoint%E8%BF%9E%E6%8E%A5%E7%82%B9"><span class="toc-text">JoinPoint连接点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Advice%E9%80%9A%E7%9F%A5"><span class="toc-text">Advice通知</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AOP%E8%81%94%E7%9B%9F%E6%A6%82%E5%BF%B5%E9%87%8A%E4%B9%89"><span class="toc-text">AOP联盟概念释义</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Interceptor-%E6%8B%A6%E6%88%AA%E5%99%A8"><span class="toc-text">Interceptor 拦截器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Invocation%E8%B0%83%E7%94%A8"><span class="toc-text">Invocation调用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Spring-AOP%E6%A6%82%E5%BF%B5%E9%87%8A%E4%B9%89"><span class="toc-text">Spring AOP概念释义</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Pointcut%E5%88%87%E7%82%B9"><span class="toc-text">Pointcut切点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Advisor%E9%80%9A%E7%9F%A5%E5%99%A8"><span class="toc-text">Advisor通知器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Introduction-%E5%BC%95%E5%85%A5"><span class="toc-text">Introduction 引入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F"><span class="toc-text">注意</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AOP%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="toc-text">AOP实现方式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E4%B8%80%EF%BC%9A%E5%9B%9E%E8%B0%83"><span class="toc-text">方法一：回调</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E4%BA%8C%EF%BC%9A%E4%BB%A3%E7%90%86"><span class="toc-text">方法二：代理</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spring-AOP"><span class="toc-text">Spring AOP</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AnnotationAwareAspectJAutoProxyCreator"><span class="toc-text">AnnotationAwareAspectJAutoProxyCreator</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E8%A7%A3%E6%9E%90%E6%88%90BeanDefinition%E6%B3%A8%E5%86%8C%E5%88%B0BeanFactory%EF%BC%9F"><span class="toc-text">如何解析成BeanDefinition注册到BeanFactory？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%95%E6%97%B6-amp-%E5%A6%82%E4%BD%95%E5%AE%9E%E4%BE%8B%E5%8C%96%EF%BC%9F"><span class="toc-text">何时&amp;如何实例化？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E8%A7%A3%E6%9E%90Advisor%EF%BC%9F"><span class="toc-text">如何解析Advisor？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%B1%BB%E5%85%B3%E7%B3%BB%EF%BC%9F"><span class="toc-text">类关系？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E7%94%9F%E6%88%90%E4%BB%A3%E7%90%86%E5%AF%B9%E8%B1%A1%EF%BC%9F"><span class="toc-text">如何生成代理对象？</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MethodInvocation"><span class="toc-text">MethodInvocation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MethodInterceptor"><span class="toc-text">MethodInterceptor</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E9%80%BB%E8%BE%91%EF%BC%88%E5%8E%9F%E7%90%86%EF%BC%89"><span class="toc-text">执行逻辑（原理）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spring-AOP%E4%B8%8EAspectJ%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-text">Spring AOP与AspectJ的关系</span></a></li></ol>
     </div>
   </section>
 
-
-  
-
-  
-    
-    
-  
-
-  <section class="widget tagcloud shadow desktop mobile">
-    
-  <header>
-    
-      <a href='/tags/'><i class="fas fa-tags fa-fw" aria-hidden="true"></i><span class='name'>热门标签</span></a>
-    
-  </header>
-
-
-    <div class='content'>
-      <a href="/tags/JDK/" style="font-size: 14px; color: #999">JDK</a> <a href="/tags/Java%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0/" style="font-size: 24px; color: #555">Java面试复习</a> <a href="/tags/MySQL/" style="font-size: 19px; color: #777">MySQL</a> <a href="/tags/Netty/" style="font-size: 14px; color: #999">Netty</a> <a href="/tags/RTP/" style="font-size: 14px; color: #999">RTP</a> <a href="/tags/Spring/" style="font-size: 14px; color: #999">Spring</a> <a href="/tags/%E3%80%8A%E8%A7%81%E8%AF%86%E3%80%8B/" style="font-size: 14px; color: #999">《见识》</a> <a href="/tags/%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" style="font-size: 19px; color: #777">动态代理</a> <a href="/tags/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" style="font-size: 19px; color: #777">基础知识</a> <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" style="font-size: 14px; color: #999">多线程</a> <a href="/tags/%E6%8A%93%E5%8C%85/" style="font-size: 14px; color: #999">抓包</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" style="font-size: 14px; color: #999">数据结构</a> <a href="/tags/%E6%A1%86%E6%9E%B6/" style="font-size: 14px; color: #999">框架</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" style="font-size: 14px; color: #999">网络协议</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 19px; color: #777">计算机网络</a> <a href="/tags/%E9%99%A4%E4%BA%86%E5%B7%A5%E4%BD%9C%E4%BB%A5%E5%A4%96%E7%9A%84/" style="font-size: 19px; color: #777">除了工作以外的</a> <a href="/tags/%E9%AB%98%E5%B9%B6%E5%8F%91/" style="font-size: 19px; color: #777">高并发</a>
-    </div>
-  </section>
-
-
-  
-
-  
-
-  
-    
-    
-
-<section class="widget shadow desktop">
-  
-  <header>
-    
-      <i class="fas fa-award fa-fw" aria-hidden="true"></i><span class='name'>站点信息</span>
-    
-  </header>
-
-
-  <div class='content'>
-    <div class="webinfo">
-      
-        <div class="webinfo-item">
-          <div>文章数目：</div>
-          <div>13 篇</div>
-        </div>
-      
-
-      
-        <div class="webinfo-item">
-          <div>已运行时间：</div>
-          <div id="webinfo-runtime-count" publish_date="03/24/2020 21:34:09"></div>
-        </div>
-        <script>
-          var BirthDay = new Date(new Date('2020/01/01'));
-          var today = new Date();
-          var timeold = (today.getTime() - BirthDay.getTime());
-          var daysold = Math.floor(timeold / (24 * 60 * 60 * 1000));
-          document.getElementById('webinfo-runtime-count').innerHTML = daysold + ' 天';
-        </script>
-      
-
-
-      
-        <div class="webinfo-item">
-          <div>本站总字数：</div>
-          <div>20.3k 字</div>
-        </div>
-      
-
-      
-        <div class="webinfo-item">
-          <div>本站访客数：</div>
-          
-          <div><span id="lc-uv"><span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span></span> 人</div>
-          
-        </div>
-      
-
-      
-        <div class="webinfo-item">
-          <div>本站总访问量：</div>
-          
-          <div><span id="lc-sv"><span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span></span> 次</div>
-          
-        </div>
-      
-
-      
-        <div class="webinfo-item">
-          <div>最后活动时间：</div>
-          
-            <div id="last-update" style="display: none;">Sun Mar 27 2022 23:38:18 GMT+0800 (China Standard Time)</div>
-            <div id="last-update-show">2022/03/27 日</div>
-          
-        </div>
-        
-        <script>
-          function timeago(dateTimeStamp) {
-              var minute = 1000 * 60; //把分，时，天，周，半个月，一个月用毫秒表示
-              var hour = minute * 60;
-              var day = hour * 24;
-              var week = day * 7;
-              var month = day * 30;
-              var now = new Date().getTime(); //获取当前时间毫秒
-              var diffValue = now - dateTimeStamp; //时间差
-              if (diffValue < 0) {
-                  return;
-              }
-              var minC = diffValue / minute; //计算时间差的分，时，天，周，月
-              var hourC = diffValue / hour;
-              var dayC = diffValue / day;
-              var weekC = diffValue / week;
-              var monthC = diffValue / month;
-              if (monthC >= 1 && monthC <= 3) {
-                  result = " " + parseInt(monthC) + " 月前"
-              } else if (weekC >= 1 && weekC <= 3) {
-                  result = " " + parseInt(weekC) + " 周前"
-              } else if (dayC >= 1 && dayC <= 6) {
-                  result = " " + parseInt(dayC) + " 天前"
-              } else if (hourC >= 1 && hourC <= 23) {
-                  result = " " + parseInt(hourC) + " 小时前"
-              } else if (minC >= 1 && minC <= 59) {
-                  result = " " + parseInt(minC) + " 分钟前"
-              } else if (diffValue >= 0 && diffValue <= minute) {
-                  result = "刚刚"
-              } else {
-                  var datetime = new Date();
-                  datetime.setTime(dateTimeStamp);
-                  var Nyear = datetime.getFullYear();
-                  var Nmonth = datetime.getMonth() + 1 < 10 ? "0" + (datetime.getMonth() + 1) : datetime.getMonth() + 1;
-                  var Ndate = datetime.getDate() < 10 ? "0" + datetime.getDate() : datetime.getDate();
-                  var Nhour = datetime.getHours() < 10 ? "0" + datetime.getHours() : datetime.getHours();
-                  var Nminute = datetime.getMinutes() < 10 ? "0" + datetime.getMinutes() : datetime.getMinutes();
-                  var Nsecond = datetime.getSeconds() < 10 ? "0" + datetime.getSeconds() : datetime.getSeconds();
-                  result = Nyear + "-" + Nmonth + "-" + Ndate
-              }
-              return result;
-          }
-          var lastUpDate = document.getElementById('last-update').innerHTML;
-          try {
-            document.getElementById('last-update-show').innerHTML = timeago(new Date(lastUpDate));
-          } catch (error) {
-            document.getElementById('last-update-show').innerHTML = '2022/03/27 日';
-          }
-        </script>
-        
-      
-    </div>
-  </div>
-</section>
-
-  
-
-  
-    
-    
-
-<section class="widget grid shadow desktop mobile">
-  
-  <header>
-    
-      <a target="_blank" rel="noopener" href='https://github.com/JoruaChan/joruachan.github.io'><i class="fas fa-headset fa-fw" aria-hidden="true"></i><span class='name'>联系开发者</span></a>
-    
-  </header>
-
-
-  <div class='content'>
-    <div class="grid navigation fixed">
-      
-        <a class="flat-box" title="https://github.com/JoruaChan/joruachan.github.io/issues" target="_blank" rel="noopener" href="https://github.com/JoruaChan/joruachan.github.io/issues"
-          
-          
-          id="https:githubcomJoruaChanjoruachangithubioissues">
-          
-            <i class="fas fa-bug fa-fw" aria-hidden="true"></i>
-          
-          反馈BUG
-        </a>
-      
-        <a class="flat-box" title="https://github.com/JoruaChan/joruachan.github.io/issues" target="_blank" rel="noopener" href="https://github.com/JoruaChan/joruachan.github.io/issues"
-          
-          
-          id="https:githubcomJoruaChanjoruachangithubioissues">
-          
-            <i class="fas fa-question-circle fa-fw" aria-hidden="true"></i>
-          
-          疑问求助
-        </a>
-      
-        <a class="flat-box" title="https://github.com/JoruaChan/joruachan.github.io/issues" target="_blank" rel="noopener" href="https://github.com/JoruaChan/joruachan.github.io/issues"
-          
-          
-          id="https:githubcomJoruaChanjoruachangithubioissues">
-          
-            <i class="fas fa-lightbulb fa-fw" aria-hidden="true"></i>
-          
-          提个建议
-        </a>
-      
-    </div>
-  </div>
-</section>
 
   
 
@@ -1302,14 +756,14 @@ Disruptor，一个适用于多线程间高并发交换数据的有界队列；
 
 <script>
   window.pdata={}
-  pdata.ispage=false;
-  pdata.postTitle="";
+  pdata.ispage=true;
+  pdata.postTitle="Spring动态代理";
   pdata.commentPath="";
   pdata.commentPlaceholder="";
 
   var l_header=document.getElementById("l_header");
   
-  l_header.classList.remove("show");
+  l_header.classList.add("show");
   
 </script>
 

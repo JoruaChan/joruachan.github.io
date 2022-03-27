@@ -5,9 +5,7 @@
   <!-- SEO相关 -->
   
     
-      
-        <meta name="robots" content="index,follow">
-      
+      <meta name="robots" content="noindex,follow">
     
   
   <!-- 渲染优化 -->
@@ -26,7 +24,7 @@
 
   <!-- 页面元数据 -->
   
-  <title>JoruaChan技术博客</title>
+  <title>标签：Spring - JoruaChan技术博客</title>
   
 
   
@@ -110,7 +108,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
   <body>
     
 
-<header id="l_header" class="l_header auto shadow blur " style='opacity: 0' >
+<header id="l_header" class="l_header auto shadow blur show" style='opacity: 0' >
   <div class='container'>
   <div id='wrapper'>
     <div class='nav-sub'>
@@ -349,7 +347,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
       <div id="l_cover">
   
     
-        <div id="half" class='cover-wrapper  dock' style="display: ;">
+        <div id="full" class='cover-wrapper  dock' style="display: none;">
           
             <div id='cover-backstretch'></div>
           
@@ -419,46 +417,14 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
         <div class="body-wrapper" id="pjax-container">
           
 
+
 <div class='l_main'>
   
+    
+      
   <section class="post-list">
     
       
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
         
           
         
@@ -515,470 +481,15 @@ S...
           </div>
         
       
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2022-03-01/jdkproxy/">
-        JDK动态代理
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      
-        问题引入
-如果不同接口，同方法名、同参数、不同返回值怎么代理的？
-如果接口整体一致但顺序不一致，使用的是同一个代理类吗？
-如果传入非接口类、重复接口类，会怎么处理？
-如果存在非公有的接口类，会怎么处理？
-
-JDK动态代理Proxy.newProxyInstanceJdk创建代理类调用方法1newProxyInstance(ClassLoader loader, Class&lt;?&gt;[...
-      
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2022/03/01</time>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2022-03-01/jdkproxy/'>
-            阅读全文
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2022-01-23/after-reading-jianshi/">
-        《见识》读后感
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      
-        第二章 人生需要做减法西瓜与芝麻内容精采
-
-社会上太多捡芝麻的人，不仅时间利用得没有效率，而且渐渐习惯于非常低层次的追求！如花大量的时间或精力来捡芝麻；
-公司和个人一样，专注西瓜去捡，目光放得更长远；
-聚焦”练就捡西瓜的能力”，从同事中脱颖而出；
-致力于捡西瓜，那就要耐得住寂寞；
-
-我的想法
-
-做哪些：有时候，想做的事情太多了，但是每个人自己除了工作外，可用时间是数得过来的。不妨把你想做的事...
-      
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2022/01/23</time>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2022-01-23/after-reading-jianshi/'>
-            阅读全文
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-    <div class='headimg-div'>
-      <a class='headimg-a' href="/2021-11-07/netty-daily/">
-        <img class='headimg' src='https://cdn.jsdelivr.net/gh/JoruaChan/BlogImages/netty-daily/cover.png'/>
-      </a>
-    </div>
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021-11-07/netty-daily/">
-        Netty日记
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      
-        2021年11月6日Linux I/O
-只有内核能与外设交互，且内核将外设的操作都视作文件操作；对文件的操作，内核都会返回fd文件描述符；对socket的读写也有对应的socket fd；
-五种IO模型：阻塞IO、非阻塞IO、IO复用、信号驱动、异步IO；
-
-五种IO模型总结：
-
-所有IO操作，都包含：内核等待数据准备好、内核拷贝数据到用户空间；
-除了异步IO，其他四种模型在拷贝期间，进程都...
-      
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021/11/07</time>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021-11-07/netty-daily/'>
-            阅读全文
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021-11-02/tcpdump-essay/">
-        tcpdump初体验
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      
-        
-tcpdump命令抓取包
-使用下载安装好的Wireshark软件打开
-分析过滤你需要的包
-
-
-      
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021/11/02</time>
-        
-          <span class="dot"></span>
-          <a class="category-link" href="/categories/%E9%9A%8F%E7%AC%94/">随笔</a>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021-11-02/tcpdump-essay/'>
-            阅读全文
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021-10-22/rtp-introduction/">
-        透彻理解RTP
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      
-        RTP——实时传输协议RTP（Real-time Transport Protocol），实时传输协议；RTP协议在RFC 3550文档中详细说明了在互联网上传递音频和视频的标准数据包格式。
-它一开始被设计为一个多播协议，但后来被用在很多的单播应用中。RTP协议常用于流媒体系统、视频会议，使它成为IP电话产业的技术基础。
-RTP协议通常是建立在UDP协议之上的，由于UDP面向数据报，是非可靠...
-      
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021/10/22</time>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021-10-22/rtp-introduction/'>
-            阅读全文
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021-09-23/look-back-jdk/">
-        再回首JDK
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      
-        如果你是刚要被Java军训的新兵，可有几时对环境搭建而不知所措？又如若你是驰骋Java战场多年的老将，可曾拿起陪伴你许久的82年的JDK回味一番？今天我们就来道一道JDK，重新来认识认识这个既熟悉又陌生的伙伴。
-既然要唠唠JDK，首先想到的，肯定是要了解下都是谁来推进Java和JDK发展的。
-Java发展的会议与组织说起Java的起源必定要提起Sun公司，由其发起了专属于Java的JavaO...
-      
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021/09/23</time>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021-09-23/look-back-jdk/'>
-            阅读全文
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021-09-15/the-first-time-2-meet-disruptor/">
-        disruptor初次见面
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      
-        每每复习Java数据结构时候，总感觉在队列中找不到一个适合高并发场景的队列。JDK提供的队列模型不尽人意，那么今天将要像大家简单介绍下：
-Disruptor，一个适用于多线程间高并发交换数据的有界队列；
-简单说几点，就能体现Disruptor的神奇：
-
-在并发情况下，普通的内存队列处理速度，和IO速度处于同一个数量级；
-基于Disruptor开发的系统单线程能支撑每秒600万订单；
-生产者消...
-      
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021/09/15</time>
-        
-          <span class="dot"></span>
-          <a class="category-link" href="/categories/%E9%9A%8F%E7%AC%94/">随笔</a>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021-09-15/the-first-time-2-meet-disruptor/'>
-            阅读全文
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021-09-07/half-of-2021/">
-        这是我的一半2021
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      
-        这篇文章起笔时间，2021年9月7日晚上。 
-间隔上篇博文，又过去了5个多月。中间发生了很多事，似乎明白了很多，让我坚定了很多选择；但是似乎又增添了不少疑惑，疑惑那些打破我认知的事情。不要觉得我矫情，也许你们觉得很正常，于我来说，可能正在经历生活、职场等等方面的历练。
-简单说下吧。
-
-婚姻，我们在三年恋爱后，终于————我迎娶她成为了丈夫，她嫁给我成为了妻子；感谢有她，庆幸有她！
-新房，房子...
-      
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021/09/07</time>
-        
-          <span class="dot"></span>
-          <a class="category-link" href="/categories/%E9%9A%8F%E4%BE%BF%E8%81%8A%E8%81%8A/">随便聊聊</a>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021-09-07/half-of-2021/'>
-            阅读全文
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021-03-22/synchronized-summary/">
-        史上最全synchronized关键字总结
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      <p>这里应该可谓史上对synchronized关键字最全的总结了，笔者可谓呕心沥血的文章！不得不看！</p>
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021/03/22</time>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021-03-22/synchronized-summary/'>
-            阅读全文
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
     
   </section>
   
     
-      <br>
-      <div class="prev-next">
-        
-        <p class="current">
-          1 / 2
-        </p>
-        
-          <a class="next" rel="next" href="/page/2/">
-            <section class="post next white-box shadow">
-              &nbsp;下一页&nbsp;<i class="fas fa-chevron-right" aria-hidden="true"></i>
-            </section>
-          </a>
-        
-      </div>
-    
   
 
 
+    
+  
 </div>
 <aside class='l_side'>
   
@@ -1295,7 +806,6 @@ Disruptor，一个适用于多线程间高并发交换数据的有界队列；
 </aside>
 
 
-
 		  
 		  <!--此文件用来存放一些不方便取值的变量-->
 <!--思路大概是将值藏到重加载的区域内-->
@@ -1309,7 +819,7 @@ Disruptor，一个适用于多线程间高并发交换数据的有界队列；
 
   var l_header=document.getElementById("l_header");
   
-  l_header.classList.remove("show");
+  l_header.classList.add("show");
   
 </script>
 
