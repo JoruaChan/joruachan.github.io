@@ -4,6 +4,44 @@
   
     
     <entry>
+      <title>linux动态库</title>
+      <link href="/2022-08-17/dynamiclibrary/"/>
+      <url>/2022-08-17/dynamiclibrary/</url>
+      
+        <content type="html"><![CDATA[<h2 id="so文件命名规则"><a href="#so文件命名规则" class="headerlink" title="so文件命名规则"></a>so文件命名规则</h2><p>libname.so.x.y.z</p><ul><li>x：major version主版本号，不同major version之间库不兼容；</li><li>y：minor version次版本号，增量更新，一般增加新接口，原接口不变，从高到低版本是兼容的；</li><li>z：release version发布版本号，bug修复、性能改进等，不添加新接口，不改变原接口；</li></ul><p>看到的只有一个主版本号的so文件，一般是有软连接到libname.so.x.y.z；</p><h2 id="动态库和操作系统的关系"><a href="#动态库和操作系统的关系" class="headerlink" title="动态库和操作系统的关系"></a>动态库和操作系统的关系</h2><h3 id="动态库搜索路径配置"><a href="#动态库搜索路径配置" class="headerlink" title="动态库搜索路径配置"></a>动态库搜索路径配置</h3><p>/etc/ld.so.conf，告诉操作系统文件去哪搜索动态库。内容如下：<code>include /etc/ld.so.conf.d/*.conf</code><br />ld.so.conf.d文件夹下有：libc.conf、x86_64-linux-gnu.conf；</p><p><img src="https://cdn.nlark.com/yuque/0/2022/png/22810517/1659886410578-b4352338-7d5c-42cc-bbf1-ca8a0ac1213e.png#clientId=u8663e778-a8ff-4&crop=0&crop=0&crop=1&crop=1&from=paste&height=308&id=tGRqF&margin=%5Bobject%20Object%5D&name=image.png&originHeight=616&originWidth=812&originalType=binary&ratio=1&rotation=0&showTitle=false&size=83356&status=done&style=stroke&taskId=uc84c3dcb-7888-4177-b62e-5c3248a9bc0&title=&width=406" class="lazyload" data-srcset="https://cdn.nlark.com/yuque/0/2022/png/22810517/1659886410578-b4352338-7d5c-42cc-bbf1-ca8a0ac1213e.png#clientId=u8663e778-a8ff-4&crop=0&crop=0&crop=1&crop=1&from=paste&height=308&id=tGRqF&margin=%5Bobject%20Object%5D&name=image.png&originHeight=616&originWidth=812&originalType=binary&ratio=1&rotation=0&showTitle=false&size=83356&status=done&style=stroke&taskId=uc84c3dcb-7888-4177-b62e-5c3248a9bc0&title=&width=406" srcset="data:image/png;base64,666" alt="image.png"></p><h3 id="ldconfig链接缓存"><a href="#ldconfig链接缓存" class="headerlink" title="ldconfig链接缓存"></a>ldconfig链接缓存</h3><p>ldconfig是动态链接库管理命令。在默认搜寻目录/lib和/usr/lib，以及配置文件/etc/ld.so.conf所列目录下，搜索出可共享的动态链接库。<br /><strong>创建出动态装入程序所需的软连接，并生成cache缓存文件到/etc/ld.so.cache（缓存了已排好序的动态库名称列表）</strong></p><p>在lib下安装新的库，或者修改/etc/ld.so.conf文件，需要调用ldconfg更新；</p><h3 id="LD-LIBRARY"><a href="#LD-LIBRARY" class="headerlink" title="LD_LIBRARY"></a>LD_LIBRARY</h3><p>当没有权限或者不想修改文件时候，可以使用LD_LIBRARY环境变量指定查找动态库搜寻路径；</p><p>如果同一个动态库有多个版本，可以利用不同用户定义不同的LD_LIBRARY环境变量，从而依赖不同的环境变量而使用不同版本的动态库；</p><h3 id="搜寻顺序"><a href="#搜寻顺序" class="headerlink" title="搜寻顺序"></a>搜寻顺序</h3><ul><li>LD_LIBRARY环境变量的路径；</li><li>/etc/ld.so.cache缓存文件的缓存内容；</li><li>/usr/lib和/lib；</li></ul><h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><p>ldconfig只是在运行时有关。gcc编译时候还要使用-L指定搜寻路径，-l表示库名；</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> linux </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 操作系统 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>chat_with_you</title>
+      <link href="/2022-06-12/chat/index/"/>
+      <url>/2022-06-12/chat/index/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Spring动态代理</title>
       <link href="/2022-03-27/springproxy/"/>
       <url>/2022-03-27/springproxy/</url>
